@@ -5,7 +5,6 @@ A Flutter app to track compounds, dosages, and schedules.
 ## Features
 - Add / edit / delete vials
 - Schedule tracking
-- Clean UI inspired by Pep AI
 
 ## Tech
 - Flutter
