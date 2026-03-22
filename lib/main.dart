@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'theme/app_theme.dart';
 import 'screens/main_screen.dart';
+import 'models/vial.dart';
+import 'models/schedule.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(VialAdapter());
+  Hive.registerAdapter(ScheduleAdapter());
+
+  await Hive.openBox<Vial>('vials');
+  await Hive.openBox<Schedule>('schedules');
+
   runApp(const MyApp());
 }
 
@@ -14,7 +28,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-
       home: MainScreen(),
     );
   }

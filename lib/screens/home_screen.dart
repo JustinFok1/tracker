@@ -80,7 +80,7 @@ class HomeScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
         Text(
-          "Pep AI",
+          "Track Lab",
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,

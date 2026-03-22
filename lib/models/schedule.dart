@@ -1,8 +1,20 @@
+import 'package:hive/hive.dart';
+
+part 'schedule.g.dart';
+
+@HiveType(typeId: 1)
 class Schedule {
+  @HiveField(0)
   final String compoundName;
+
+  @HiveField(1)
   final double dosage;
+
+  @HiveField(2)
   final String unit;
-  final String frequency; // e.g. "Daily", "Weekly"
+
+  @HiveField(3)
+  final String frequency;
 
   Schedule({
     required this.compoundName,
