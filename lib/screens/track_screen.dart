@@ -60,10 +60,47 @@ class _TrackScreenState extends State<TrackScreen> {
               )
                   : Column(
                 children: vials.map((vial) {
-                  return GestureDetector(
-                    onTap: () => _editVial(vial),
-                    onLongPress: () => _showVialOptions(vial),
-                    child: _vialCard(vial),
+                  return Dismissible(
+                    key: Key(vial.hashCode.toString()),
+
+                    direction: DismissDirection.horizontal,
+
+                    background: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
+
+                    secondaryBackground: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerRight,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        _editVial(vial);
+                        return false;
+                      } else {
+                        _confirmDeleteVial(vial);
+                        return false;
+                      }
+                    },
+
+                    child: GestureDetector(
+                      onTap: () => _editVial(vial),
+                      child: _vialCard(vial),
+                    ),
                   );
                 }).toList(),
               ),
@@ -85,9 +122,43 @@ class _TrackScreenState extends State<TrackScreen> {
               )
                   : Column(
                 children: schedules.map((s) {
-                  return GestureDetector(
-                    onLongPress: () =>
-                        _showScheduleOptions(s),
+                  return Dismissible(
+                    key: Key(s.hashCode.toString()),
+
+                    direction: DismissDirection.horizontal,
+
+                    background: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
+
+                    secondaryBackground: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerRight,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        _editSchedule(s);
+                        return false;
+                      } else {
+                        _confirmDeleteSchedule(s);
+                        return false;
+                      }
+                    },
+
                     child: _scheduleCard(s),
                   );
                 }).toList(),

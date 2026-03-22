@@ -20,7 +20,6 @@ class _AddVialScreenState extends State<AddVialScreen> {
   void initState() {
     super.initState();
 
-    /// ✅ PRE-FILL IF EDITING
     if (widget.existingVial != null) {
       selectedCompound = widget.existingVial!.compoundName;
       dosageController.text =
@@ -99,14 +98,12 @@ class _AddVialScreenState extends State<AddVialScreen> {
       unit: "mg",
     );
 
-    /// ✅ EDIT MODE
     if (widget.existingVial != null) {
       VialStore.instance.updateVial(
         widget.existingVial!,
         newVial,
       );
     } else {
-      /// ✅ ADD MODE
       VialStore.instance.addVial(newVial);
     }
 
