@@ -82,7 +82,6 @@ class _DoseCardState extends State<DoseCard> {
 
           /// EMPTY
           if (todaySchedules.isEmpty)
-            if (todaySchedules.isEmpty)
               const SizedBox(
                 height: 135,
                 child: Align(
