@@ -82,13 +82,20 @@ class _DoseCardState extends State<DoseCard> {
 
           /// EMPTY
           if (todaySchedules.isEmpty)
-            const Text(
-              "No doses today",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )
+            if (todaySchedules.isEmpty)
+              const SizedBox(
+                height: 135,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "No doses today",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
 
           /// HAS DATA
           else

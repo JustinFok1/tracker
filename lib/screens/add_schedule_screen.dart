@@ -101,6 +101,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     final vial = selectedVial!;
 
     final schedule = Schedule(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       compoundName: vial.compoundName,
       dosage: vial.dosage,
       unit: vial.unit,

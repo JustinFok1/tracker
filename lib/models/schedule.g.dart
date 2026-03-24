@@ -17,27 +17,30 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Schedule(
-      compoundName: fields[0] as String,
-      dosage: fields[1] as double,
-      unit: fields[2] as String,
-      daysOfWeek: (fields[3] as List).cast<int>(),
-      startDate: fields[4] as DateTime,
+      id: fields[0] as String,
+      compoundName: fields[1] as String,
+      dosage: fields[2] as double,
+      unit: fields[3] as String,
+      daysOfWeek: (fields[4] as List).cast<int>(),
+      startDate: fields[5] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, Schedule obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.compoundName)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.dosage)
+      ..write(obj.compoundName)
       ..writeByte(2)
-      ..write(obj.unit)
+      ..write(obj.dosage)
       ..writeByte(3)
-      ..write(obj.daysOfWeek)
+      ..write(obj.unit)
       ..writeByte(4)
+      ..write(obj.daysOfWeek)
+      ..writeByte(5)
       ..write(obj.startDate);
   }
 

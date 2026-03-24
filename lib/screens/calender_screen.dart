@@ -19,12 +19,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final schedules = ScheduleStore.instance.schedules;
 
     return schedules.where((s) {
-      /// Only show if day is AFTER start date
       if (day.isBefore(s.startDate)) return false;
-
-      /// Match selected weekday
       return s.daysOfWeek.contains(day.weekday);
     }).toList();
+  }
+
+  String _doseKey(Schedule s) {
+    return "${s.compoundName}_${s.dosage}_${s.unit}";
   }
 
   @override
@@ -45,28 +46,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
             firstDay: DateTime.utc(2020),
             lastDay: DateTime.utc(2030),
             focusedDay: _focusedDay,
-
             calendarFormat: CalendarFormat.month,
             availableCalendarFormats: const {
               CalendarFormat.month: 'Month',
             },
-
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
             ),
-
             selectedDayPredicate: (day) =>
                 isSameDay(_selectedDay, day),
-
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
             },
-
             eventLoader: (day) => _getSchedulesForDay(day),
-
             calendarStyle: const CalendarStyle(
               todayDecoration: BoxDecoration(
                 color: Colors.purple,
@@ -99,6 +94,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               children: selectedSchedules.map((s) {
+                final key = _doseKey(s);
+
                 return Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.all(16),
@@ -111,7 +108,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     MainAxisAlignment.spaceBetween,
                     children: [
                       Text(s.compoundName),
-
                       Row(
                         children: [
                           Text("${s.dosage}${s.unit}"),
@@ -120,18 +116,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           GestureDetector(
                             onTap: () {
                               DoseLogStore.instance.toggleDose(
-                                s.compoundName,
+                                key, // 🔥 FIXED
                                 _selectedDay!,
                               );
                               setState(() {});
                             },
                             child: Icon(
                               DoseLogStore.instance.isTaken(
-                                s.compoundName,
+                                key, // 🔥 FIXED
                                 _selectedDay!,
                               )
                                   ? Icons.check_circle
-                                  : Icons.radio_button_unchecked,
+                                  : Icons
+                                  .radio_button_unchecked,
                               color: Colors.purple,
                             ),
                           ),

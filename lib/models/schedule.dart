@@ -5,21 +5,25 @@ part 'schedule.g.dart';
 @HiveType(typeId: 1)
 class Schedule extends HiveObject {
   @HiveField(0)
-  final String compoundName;
+  final String id;
 
   @HiveField(1)
-  final double dosage;
+  final String compoundName;
 
   @HiveField(2)
-  final String unit;
+  final double dosage;
 
   @HiveField(3)
-  final List<int> daysOfWeek; // 1 = Mon ... 7 = Sun
+  final String unit;
 
   @HiveField(4)
+  final List<int> daysOfWeek;
+
+  @HiveField(5)
   final DateTime startDate;
 
   Schedule({
+    required this.id,
     required this.compoundName,
     required this.dosage,
     required this.unit,
