@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'schedule.g.dart';
 
 @HiveType(typeId: 1)
-class Schedule {
+class Schedule extends HiveObject {
   @HiveField(0)
   final String compoundName;
 
@@ -14,12 +14,16 @@ class Schedule {
   final String unit;
 
   @HiveField(3)
-  final String frequency;
+  final List<int> daysOfWeek; // 1 = Mon ... 7 = Sun
+
+  @HiveField(4)
+  final DateTime startDate;
 
   Schedule({
     required this.compoundName,
     required this.dosage,
     required this.unit,
-    required this.frequency,
+    required this.daysOfWeek,
+    required this.startDate,
   });
 }

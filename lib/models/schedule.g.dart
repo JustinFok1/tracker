@@ -20,14 +20,15 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       compoundName: fields[0] as String,
       dosage: fields[1] as double,
       unit: fields[2] as String,
-      frequency: fields[3] as String,
+      daysOfWeek: (fields[3] as List).cast<int>(),
+      startDate: fields[4] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, Schedule obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.compoundName)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class ScheduleAdapter extends TypeAdapter<Schedule> {
       ..writeByte(2)
       ..write(obj.unit)
       ..writeByte(3)
-      ..write(obj.frequency);
+      ..write(obj.daysOfWeek)
+      ..writeByte(4)
+      ..write(obj.startDate);
   }
 
   @override

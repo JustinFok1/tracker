@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:peptide_tracker/screens/add_vial_screen.dart';
+import 'calender_screen.dart';
 import 'home_screen.dart';
 import 'track_screen.dart';
 import '../widgets/bottom_nav.dart';
-import 'add_vial_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final screens = [
     const HomeScreen(),
     const TrackScreen(),
+    const CalendarScreen(),
     const Center(child: Text("Lifestyle")),
     const Center(child: Text("Profile")),
   ];

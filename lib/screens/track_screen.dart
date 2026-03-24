@@ -41,6 +41,9 @@ class _TrackScreenState extends State<TrackScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: ListView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             children: [
               _header(),
               const SizedBox(height: 20),
@@ -49,61 +52,25 @@ class _TrackScreenState extends State<TrackScreen> {
               _sectionHeader("VIALS", "+ Add", _openAddVial),
               const SizedBox(height: 12),
 
-              vials.isEmpty
-                  ? _bigEmptyCard(
-                icon: Icons.opacity,
-                title: "No vials yet",
-                subtitle:
-                "Add your first vial to start tracking",
-                buttonText: "+ Add Vial",
-                onPressed: _openAddVial,
-              )
-                  : Column(
-                children: vials.map((vial) {
-                  return Dismissible(
-                    key: Key(vial.hashCode.toString()),
-
-                    direction: DismissDirection.horizontal,
-
-                    background: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.centerLeft,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.edit, color: Colors.white),
-                    ),
-
-                    secondaryBackground: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.centerRight,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
-                        _editVial(vial);
-                        return false;
-                      } else {
-                        _confirmDeleteVial(vial);
-                        return false;
-                      }
-                    },
-
-                    child: GestureDetector(
-                      onTap: () => _editVial(vial),
-                      child: _vialCard(vial),
-                    ),
-                  );
-                }).toList(),
-              ),
+            vials.isEmpty
+                ? _bigEmptyCard(
+              icon: Icons.opacity,
+              title: "No vials yet",
+              subtitle: "Add your first vial to start tracking",
+              buttonText: "+ Add Vial",
+              onPressed: _openAddVial,
+            )
+                : Column(
+              children: _groupVials(vials).entries.map((entry) {
+                return _ExpandableVialTile(
+                  compound: entry.key,
+                  vials: entry.value,
+                  cardDecoration: _cardDecoration(),
+                  onEdit: _editVial,
+                  onDelete: _confirmDeleteVial,
+                );
+              }).toList(),
+            ),
 
               const SizedBox(height: 24),
 
@@ -120,46 +87,18 @@ class _TrackScreenState extends State<TrackScreen> {
                 buttonText: "+ Add Schedule",
                 onPressed: _openAddSchedule,
               )
-                  : Column(
-                children: schedules.map((s) {
-                  return Dismissible(
-                    key: Key(s.hashCode.toString()),
+              : Column(
+                children: _groupedSchedules(schedules).entries.map((entry) {
+                  final compound = entry.key;
+                  final grouped = entry.value;
 
-                    direction: DismissDirection.horizontal,
-
-                    background: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.centerLeft,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.edit, color: Colors.white),
-                    ),
-
-                    secondaryBackground: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.centerRight,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
-                        _editSchedule(s);
-                        return false;
-                      } else {
-                        _confirmDeleteSchedule(s);
-                        return false;
-                      }
-                    },
-
-                    child: _scheduleCard(s),
+                  return _ExpandableScheduleTile(
+                    compound: compound,
+                    schedules: grouped,
+                    onEdit: _editSchedule,
+                    onDelete: _confirmDeleteSchedule,
+                    formatDays: _formatDays,
+                    cardDecoration: _cardDecoration(),
                   );
                 }).toList(),
               ),
@@ -320,6 +259,11 @@ class _TrackScreenState extends State<TrackScreen> {
     );
   }
 
+  String _formatDays(List<int> days) {
+    const names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    return days.map((d) => names[d - 1]).join(", ");
+  }
+
   /// ===== SCHEDULE CARD =====
   Widget _scheduleCard(Schedule s) {
     return Container(
@@ -329,8 +273,8 @@ class _TrackScreenState extends State<TrackScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(s.compoundName),
-          Text(s.frequency),
+          Text("${s.compoundName} (${s.dosage}${s.unit})"),
+          Text(_formatDays(s.daysOfWeek)), // assuming you're using days now
         ],
       ),
     );
@@ -484,5 +428,286 @@ class _TrackScreenState extends State<TrackScreen> {
         ],
       ),
     );
+  }
+
+  Map<String, List<Schedule>> _groupedSchedules(List<Schedule> schedules) {
+    final Map<String, List<Schedule>> map = {};
+
+    for (var s in schedules) {
+      map.putIfAbsent(s.compoundName, () => []).add(s);
+    }
+
+    return map;
+  }
+  Map<String, List<Vial>> _groupVials(List<Vial> vials) {
+    final Map<String, List<Vial>> map = {};
+
+    for (var v in vials) {
+      map.putIfAbsent(v.compoundName, () => []).add(v);
+    }
+
+    return map;
+  }
+}
+
+class _ExpandableVialTile extends StatefulWidget {
+  final String compound;
+  final List<Vial> vials;
+  final BoxDecoration cardDecoration;
+  final Function(Vial) onEdit;
+  final Function(Vial) onDelete;
+
+  const _ExpandableVialTile({
+    required this.compound,
+    required this.vials,
+    required this.cardDecoration,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  State<_ExpandableVialTile> createState() =>
+      _ExpandableVialTileState();
+}
+
+class _ExpandableVialTileState extends State<_ExpandableVialTile> {
+  bool expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        /// MAIN TILE (compound name)
+        GestureDetector(
+          onTap: () => setState(() => expanded = !expanded),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: widget.cardDecoration,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.compound),
+                Icon(
+                  expanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        /// EXPANDED DOSAGES
+        if (expanded)
+          Column(
+            children: _groupByDosage(widget.vials).entries.map((entry) {
+              final dosageKey = entry.key;
+              final vials = entry.value;
+
+              return Dismissible(
+                key: Key("${widget.compound}_$dosageKey"),
+
+                direction: DismissDirection.horizontal,
+
+                background: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.edit, color: Colors.white),
+                ),
+
+                secondaryBackground: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.centerRight,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+
+                confirmDismiss: (direction) async {
+                  if (direction == DismissDirection.startToEnd) {
+                    widget.onEdit(vials.first);
+                    return false;
+                  } else {
+                    widget.onDelete(vials.first);
+                    return false;
+                  }
+                },
+
+                child: Container(
+                  margin: const EdgeInsets.only(
+                      bottom: 12, left: 8, right: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: widget.cardDecoration,
+                  child: Row(
+                    mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(dosageKey),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  Map<String, List<Vial>> _groupByDosage(List<Vial> vials) {
+    final Map<String, List<Vial>> map = {};
+
+    for (var v in vials) {
+      final key = "${v.dosage}${v.unit}";
+      map.putIfAbsent(key, () => []).add(v);
+    }
+
+    return map;
+  }
+}
+
+class _ExpandableScheduleTile extends StatefulWidget {
+  final String compound;
+  final List<Schedule> schedules;
+  final Function(Schedule) onEdit;
+  final Function(Schedule) onDelete;
+  final String Function(List<int>) formatDays;
+  final BoxDecoration cardDecoration;
+
+  const _ExpandableScheduleTile({
+    required this.compound,
+    required this.schedules,
+    required this.onEdit,
+    required this.onDelete,
+    required this.formatDays,
+    required this.cardDecoration,
+  });
+
+  @override
+  State<_ExpandableScheduleTile> createState() =>
+      _ExpandableScheduleTileState();
+}
+
+class _ExpandableScheduleTileState
+    extends State<_ExpandableScheduleTile> {
+  bool expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        /// MAIN TILE (UNCHANGED STYLE)
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              expanded = !expanded;
+            });
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: widget.cardDecoration,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.compound),
+                Icon(
+                  expanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        /// EXPANDED LIST
+        if (expanded)
+          Column(
+            children: _groupByDosage(widget.schedules).entries.map((entry) {
+              final dosageKey = entry.key;
+              final schedules = entry.value;
+
+              /// Merge all days for same dosage
+              final allDays = schedules
+                  .expand((s) => s.daysOfWeek)
+                  .toSet()
+                  .toList()
+                ..sort();
+
+              return Dismissible(
+                key: Key("${widget.compound}_$dosageKey"),
+
+                direction: DismissDirection.horizontal,
+
+                background: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.edit, color: Colors.white),
+                ),
+
+                secondaryBackground: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.centerRight,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+
+                confirmDismiss: (direction) async {
+                  if (direction == DismissDirection.startToEnd) {
+                    widget.onEdit(schedules.first);
+                    return false;
+                  } else {
+                    widget.onDelete(schedules.first);
+                    return false;
+                  }
+                },
+
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12, left: 8, right: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: widget.cardDecoration,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(dosageKey),
+                      Text(widget.formatDays(allDays)),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+  Map<String, List<Schedule>> _groupByDosage(List<Schedule> schedules) {
+    final Map<String, List<Schedule>> map = {};
+
+    for (var s in schedules) {
+      final key = "${s.dosage}${s.unit}";
+      map.putIfAbsent(key, () => []).add(s);
+    }
+
+    return map;
   }
 }

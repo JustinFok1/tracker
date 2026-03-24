@@ -48,7 +48,7 @@ class _AddVialScreenState extends State<AddVialScreen> {
             DropdownButtonFormField<String>(
               dropdownColor: const Color(0xFF1A1A1A),
               hint: const Text("Select Compound"),
-              value: selectedCompound,
+              initialValue: selectedCompound,
               items: allCompounds
                   .map((c) => DropdownMenuItem(
                 value: c.name,

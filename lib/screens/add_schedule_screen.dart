@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/vial_store.dart';
 import '../data/schedule_store.dart';
 import '../models/schedule.dart';
+import '../models/vial.dart';
 
 class AddScheduleScreen extends StatefulWidget {
   final Schedule? existingSchedule;
@@ -13,16 +14,24 @@ class AddScheduleScreen extends StatefulWidget {
 }
 
 class _AddScheduleScreenState extends State<AddScheduleScreen> {
-  String? selectedVial;
-  String frequency = "Daily";
+  Vial? selectedVial;
+  List<int> selectedDays = [];
 
   @override
   void initState() {
     super.initState();
 
     if (widget.existingSchedule != null) {
-      selectedVial = widget.existingSchedule!.compoundName;
-      frequency = widget.existingSchedule!.frequency;
+      selectedDays = List.from(widget.existingSchedule!.daysOfWeek);
+
+      final vials = VialStore.instance.vials;
+
+      selectedVial = vials.firstWhere(
+            (v) =>
+        v.compoundName == widget.existingSchedule!.compoundName &&
+            v.dosage == widget.existingSchedule!.dosage,
+        orElse: () => vials.isNotEmpty ? vials.first : null as Vial,
+      );
     }
   }
 
@@ -46,14 +55,14 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
         child: Column(
           children: [
             /// SELECT VIAL
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<Vial>(
               dropdownColor: const Color(0xFF1A1A1A),
               hint: const Text("Select Vial"),
               value: selectedVial,
               items: vials.map((v) {
-                return DropdownMenuItem(
-                  value: v.compoundName,
-                  child: Text(v.compoundName),
+                return DropdownMenuItem<Vial>(
+                  value: v,
+                  child: Text("${v.compoundName} (${v.dosage}${v.unit})"),
                 );
               }).toList(),
               onChanged: (value) {
@@ -63,24 +72,12 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
 
             const SizedBox(height: 20),
 
-            /// FREQUENCY
-            DropdownButtonFormField<String>(
-              dropdownColor: const Color(0xFF1A1A1A),
-              value: frequency,
-              items: ["Daily", "Weekly"]
-                  .map((f) => DropdownMenuItem(
-                value: f,
-                child: Text(f),
-              ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => frequency = value!);
-              },
-            ),
+            /// SELECT DAYS
+            _daySelector(),
 
             const SizedBox(height: 20),
 
-            /// SAVE
+            /// SAVE BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -99,25 +96,63 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   }
 
   void _saveSchedule() {
-    if (selectedVial == null) return;
+    if (selectedVial == null || selectedDays.isEmpty) return;
 
-    final vial = VialStore.instance.vials
-        .firstWhere((v) => v.compoundName == selectedVial);
+    final vial = selectedVial!;
 
     final schedule = Schedule(
       compoundName: vial.compoundName,
       dosage: vial.dosage,
       unit: vial.unit,
-      frequency: frequency,
+      daysOfWeek: selectedDays,
+      startDate: DateTime.now(),
     );
 
     /// EDIT MODE
     if (widget.existingSchedule != null) {
-      ScheduleStore.instance.removeSchedule(widget.existingSchedule!);
+      ScheduleStore.instance.updateSchedule(
+        widget.existingSchedule!,
+        schedule,
+      );
+    } else {
+      ScheduleStore.instance.addSchedule(schedule);
     }
 
-    ScheduleStore.instance.addSchedule(schedule);
-
     Navigator.pop(context);
+  }
+
+  Widget _daySelector() {
+    final days = ["M", "T", "W", "T", "F", "S", "S"];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(7, (index) {
+        final day = index + 1;
+
+        final selected = selectedDays.contains(day);
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              if (selected) {
+                selectedDays.remove(day);
+              } else {
+                selectedDays.add(day);
+              }
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? Colors.purple
+                  : const Color(0xFF1A1A1A),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(days[index]),
+          ),
+        );
+      }),
+    );
   }
 }
