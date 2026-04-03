@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _topCards(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: DoseCard()),
+        Expanded(child: DoseCard()),
         const SizedBox(width: 12),
         Expanded(child: _nextDoseCard(context)),
       ],

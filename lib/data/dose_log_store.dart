@@ -53,7 +53,6 @@ class DoseLogStore extends ChangeNotifier {
       if (taken) {
         streak++;
       } else {
-        // Day 0 = today: allow missing (might not have dosed yet)
         if (i == 0) continue;
         break;
       }

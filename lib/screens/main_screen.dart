@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:peptide_tracker/screens/add_vial_screen.dart';
 import 'calender_screen.dart';
 import 'home_screen.dart';
 import 'track_screen.dart';
@@ -46,18 +45,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AddVialScreen(),
-            ),
-          );
-        },
-        backgroundColor: const Color(0xFFB388FF),
-        child: const Icon(Icons.add),
-      ),
+
     );
   }
 }

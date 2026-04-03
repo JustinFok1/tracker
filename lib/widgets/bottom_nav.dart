@@ -10,35 +10,85 @@ class BottomNav extends StatelessWidget {
     required this.onTap,
   });
 
+  static const _items = [
+    _NavItem(icon: Icons.home_rounded, label: 'Home'),
+    _NavItem(icon: Icons.bar_chart_rounded, label: 'Track'),
+    _NavItem(icon: Icons.person_rounded, label: 'Profile'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(30),
+        color: const Color(0xFF141414),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFF222222)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _item(Icons.home, 0),
-          _item(Icons.show_chart, 1),
-          _item(Icons.fitness_center, 2),
-          _item(Icons.person, 3),
-        ],
+        children: List.generate(_items.length, (index) {
+          final item = _items[index];
+          final selected = currentIndex == index;
+
+          return GestureDetector(
+            onTap: () => onTap(index),
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: selected
+                    ? Colors.purple.withOpacity(0.15)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    item.icon,
+                    color: selected ? Colors.purpleAccent : Colors.grey,
+                    size: 22,
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    child: selected
+                        ? Row(
+                      children: [
+                        const SizedBox(width: 6),
+                        Text(
+                          item.label,
+                          style: const TextStyle(
+                            color: Colors.purpleAccent,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
+}
 
-  Widget _item(IconData icon, int index) {
-    final isSelected = currentIndex == index;
-
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: Icon(
-        icon,
-        color: isSelected ? Colors.purple : Colors.grey,
-      ),
-    );
-  }
+class _NavItem {
+  final IconData icon;
+  final String label;
+  const _NavItem({required this.icon, required this.label});
 }

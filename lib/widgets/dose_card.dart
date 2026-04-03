@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/schedule_store.dart';
+import '../data/dose_log_store.dart';
 import '../models/schedule.dart';
 
 class DoseCard extends StatefulWidget {
@@ -10,172 +11,186 @@ class DoseCard extends StatefulWidget {
 }
 
 class _DoseCardState extends State<DoseCard> {
-  final Set<String> expanded = {};
+  @override
+  void initState() {
+    super.initState();
+    ScheduleStore.instance.addListener(_refresh);
+    DoseLogStore.instance.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    ScheduleStore.instance.removeListener(_refresh);
+    DoseLogStore.instance.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() => setState(() {});
 
   List<Schedule> _getTodaySchedules() {
-    final schedules = ScheduleStore.instance.schedules;
     final today = DateTime.now().weekday;
-
-    return schedules.where((s) {
-      if (DateTime.now().isBefore(s.startDate)) return false;
+    final now = DateTime.now();
+    return ScheduleStore.instance.schedules.where((s) {
+      if (now.isBefore(s.startDate)) return false;
       return s.daysOfWeek.contains(today);
     }).toList();
   }
 
-  Map<String, List<Schedule>> _groupByCompound(List<Schedule> schedules) {
-    final Map<String, List<Schedule>> map = {};
-
-    for (var s in schedules) {
-      map.putIfAbsent(s.compoundName, () => []);
-      map[s.compoundName]!.add(s);
-    }
-
-    return map;
-  }
-
-  Map<String, List<Schedule>> _groupByDosage(List<Schedule> schedules) {
-    final Map<String, List<Schedule>> map = {};
-
-    for (var s in schedules) {
-      final key = "${s.dosage}${s.unit}";
-      map.putIfAbsent(key, () => []);
-      map[key]!.add(s);
-    }
-
-    return map;
-  }
+  String _doseKey(Schedule s) => "${s.compoundName}_${s.dosage}_${s.unit}";
 
   @override
   Widget build(BuildContext context) {
-    final todaySchedules = _getTodaySchedules();
-    final grouped = _groupByCompound(todaySchedules);
+    final today = DateTime.now();
+    final schedules = _getTodaySchedules();
+    final taken = schedules
+        .where((s) => DoseLogStore.instance.isTaken(_doseKey(s), today))
+        .length;
+    final total = schedules.length;
+    final allDone = total > 0 && taken == total;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF1A1A1A),
-            Color(0xFF222222),
-          ],
+          colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          // Header row
+          Row(
             children: [
-              Icon(Icons.access_time, color: Colors.purple),
-              SizedBox(width: 8),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: allDone
+                      ? Colors.greenAccent.withOpacity(0.12)
+                      : Colors.purple.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  allDone ? Icons.check_circle : Icons.access_time,
+                  color: allDone ? Colors.greenAccent : Colors.purple,
+                  size: 15,
+                ),
+              ),
+              const SizedBox(width: 8),
               Text(
                 "TODAY",
                 style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+                  color: allDone ? Colors.greenAccent : Colors.grey,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          /// EMPTY
-          if (todaySchedules.isEmpty)
-              const SizedBox(
-                height: 135,
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "No doses today",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+          // Empty state
+          if (schedules.isEmpty)
+            const SizedBox(
+              height: 80,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "No doses\ntoday",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    height: 1.4,
                   ),
                 ),
-              )
+              ),
+            )
 
-          /// HAS DATA
-          else
-            SizedBox(
-              height: 135,
-              child: ListView(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
+          // Has doses
+          else ...[
+            // Progress indicator
+            Row(
+              children: [
+                Text(
+                  "$taken",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: allDone ? Colors.greenAccent : Colors.white,
+                  ),
                 ),
-                children: grouped.entries.map((entry) {
-                  final compound = entry.key;
-                  final schedules = entry.value;
-                  final isExpanded = expanded.contains(compound);
+                Text(
+                  " / $total",
+                  style: const TextStyle(
+                      fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// HEADER (tap to expand)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (isExpanded) {
-                              expanded.remove(compound);
-                            } else {
-                              expanded.add(compound);
-                            }
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  compound,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.visible,
-                                  softWrap: true,
-                                ),
-                              ),
-                              Icon(
-                                isExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                size: 18,
-                              ),
-                            ],
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: total > 0 ? taken / total : 0,
+                minHeight: 4,
+                backgroundColor: const Color(0xFF2A2A2A),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  allDone ? Colors.greenAccent : Colors.purple,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Compound list
+            SizedBox(
+              height: 70,
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                children: schedules.map((s) {
+                  final isTaken = DoseLogStore.instance
+                      .isTaken(_doseKey(s), today);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isTaken
+                              ? Icons.check_circle
+                              : Icons.circle_outlined,
+                          color: isTaken
+                              ? Colors.greenAccent
+                              : Colors.grey,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            s.compoundName,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isTaken
+                                  ? Colors.grey
+                                  : Colors.white70,
+                              decoration: isTaken
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-
-                      /// EXPANDED DOSAGES
-                      if (isExpanded)
-                        ..._groupByDosage(schedules)
-                            .entries
-                            .map((d) {
-                          final dosageKey = d.key;
-
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                left: 8, bottom: 4),
-                            child: Text(
-                              dosageKey,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        }),
-                    ],
+                      ],
+                    ),
                   );
                 }).toList(),
               ),
             ),
+          ],
         ],
       ),
     );
