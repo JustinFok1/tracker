@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/vial_store.dart';
 import '../data/schedule_store.dart';
+import '../data/dose_log_store.dart';
 import '../models/vial.dart';
 import '../models/schedule.dart';
 import 'add_vial_screen.dart';
@@ -19,12 +20,14 @@ class _TrackScreenState extends State<TrackScreen> {
     super.initState();
     VialStore.instance.addListener(_refresh);
     ScheduleStore.instance.addListener(_refresh);
+    DoseLogStore.instance.addListener(_refresh);
   }
 
   @override
   void dispose() {
     VialStore.instance.removeListener(_refresh);
     ScheduleStore.instance.removeListener(_refresh);
+    DoseLogStore.instance.removeListener(_refresh);
     super.dispose();
   }
 
@@ -52,25 +55,25 @@ class _TrackScreenState extends State<TrackScreen> {
               _sectionHeader("VIALS", "+ Add", _openAddVial),
               const SizedBox(height: 12),
 
-            vials.isEmpty
-                ? _bigEmptyCard(
-              icon: Icons.opacity,
-              title: "No vials yet",
-              subtitle: "Add your first vial to start tracking",
-              buttonText: "+ Add Vial",
-              onPressed: _openAddVial,
-            )
-                : Column(
-              children: _groupVials(vials).entries.map((entry) {
-                return _ExpandableVialTile(
-                  compound: entry.key,
-                  vials: entry.value,
-                  cardDecoration: _cardDecoration(),
-                  onEdit: _editVial,
-                  onDelete: _confirmDeleteVial,
-                );
-              }).toList(),
-            ),
+              vials.isEmpty
+                  ? _bigEmptyCard(
+                icon: Icons.opacity,
+                title: "No vials yet",
+                subtitle: "Add your first vial to start tracking",
+                buttonText: "+ Add Vial",
+                onPressed: _openAddVial,
+              )
+                  : Column(
+                children: _groupVials(vials).entries.map((entry) {
+                  return _ExpandableVialTile(
+                    compound: entry.key,
+                    vials: entry.value,
+                    cardDecoration: _cardDecoration(),
+                    onEdit: _editVial,
+                    onDelete: _confirmDeleteVial,
+                  );
+                }).toList(),
+              ),
 
               const SizedBox(height: 24),
 
@@ -87,7 +90,7 @@ class _TrackScreenState extends State<TrackScreen> {
                 buttonText: "+ Add Schedule",
                 onPressed: _openAddSchedule,
               )
-              : Column(
+                  : Column(
                 children: _groupedSchedules(schedules).entries.map((entry) {
                   final compound = entry.key;
                   final grouped = entry.value;
@@ -106,27 +109,159 @@ class _TrackScreenState extends State<TrackScreen> {
               const SizedBox(height: 24),
 
               /// ===== STATS =====
-              const Text(
-                "Tracking Stats",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              _sectionHeader("STATS", "", () {}),
+              const SizedBox(height: 12),
+              _buildStats(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// ===== STATS SECTION =====
+  Widget _buildStats() {
+    final schedules = ScheduleStore.instance.schedules;
+
+    // Build unique compound keys matching DoseLogStore format
+    final compoundKeys = schedules
+        .map((s) => "${s.compoundName}_${s.dosage}_${s.unit}")
+        .toSet()
+        .toList();
+
+    final dosesThisWeek = DoseLogStore.instance.dosesThisWeek(compoundKeys);
+    final streak = DoseLogStore.instance.currentStreak(compoundKeys);
+
+    // Compounds on cycle = unique compound names in active schedules
+    final onCycle = schedules.map((s) => s.compoundName).toSet().toList();
+
+    if (schedules.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: _cardDecoration(),
+        child: const Text(
+          "Add a schedule to start tracking stats",
+          style: TextStyle(color: Colors.grey),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Row 1: Doses this week + Streak
+        Row(
+          children: [
+            Expanded(
+              child: _statCard(
+                icon: Icons.check_circle_outline,
+                label: "This Week",
+                value: dosesThisWeek.toString(),
+                unit: "doses",
               ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _statCard(
+                icon: Icons.local_fire_department,
+                label: "Streak",
+                value: streak.toString(),
+                unit: "days",
+                accentColor: streak >= 7 ? Colors.orange : Colors.purple,
+              ),
+            ),
+          ],
+        ),
 
-              const SizedBox(height: 10),
+        const SizedBox(height: 12),
 
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: _cardDecoration(),
-                child: const Text(
-                  "No tracking data yet",
-                  style: TextStyle(color: Colors.grey),
-                ),
+        // Row 2: Compounds on cycle
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: _cardDecoration(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.science, color: Colors.purple, size: 16),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "ON CYCLE",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              onCycle.isEmpty
+                  ? const Text("None", style: TextStyle(color: Colors.grey))
+                  : Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: onCycle.map((name) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: Colors.purple.withOpacity(0.4)),
+                    ),
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                          color: Colors.purple, fontSize: 13),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _statCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required String unit,
+    Color accentColor = Colors.purple,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: accentColor, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                label.toUpperCase(),
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: accentColor,
+            ),
+          ),
+          Text(
+            unit,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ],
       ),
     );
   }
