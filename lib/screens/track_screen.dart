@@ -41,89 +41,227 @@ class _TrackScreenState extends State<TrackScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: SafeArea(
-        child: Padding(
+        child: ListView(
           padding: const EdgeInsets.all(16),
-          child: ListView(
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            children: [
-              _header(),
-              const SizedBox(height: 20),
-
-              /// ===== VIALS =====
-              _sectionHeader("VIALS", "+ Add", _openAddVial),
-              const SizedBox(height: 12),
-
-              vials.isEmpty
-                  ? _bigEmptyCard(
-                icon: Icons.opacity,
-                title: "No vials yet",
-                subtitle: "Add your first vial to start tracking",
-                buttonText: "+ Add Vial",
-                onPressed: _openAddVial,
-              )
-                  : Column(
-                children: _groupVials(vials).entries.map((entry) {
-                  return _ExpandableVialTile(
-                    compound: entry.key,
-                    vials: entry.value,
-                    cardDecoration: _cardDecoration(),
-                    onEdit: _editVial,
-                    onDelete: _confirmDeleteVial,
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// ===== SCHEDULES =====
-              _sectionHeader("SCHEDULES", "+ Schedule", _openAddSchedule),
-              const SizedBox(height: 12),
-
-              schedules.isEmpty
-                  ? _bigEmptyCard(
-                icon: Icons.calendar_today,
-                title: "No schedules yet",
-                subtitle:
-                "Add a vial first to create your first schedule",
-                buttonText: "+ Add Schedule",
-                onPressed: _openAddSchedule,
-              )
-                  : Column(
-                children: _groupedSchedules(schedules).entries.map((entry) {
-                  final compound = entry.key;
-                  final grouped = entry.value;
-
-                  return _ExpandableScheduleTile(
-                    compound: compound,
-                    schedules: grouped,
-                    onEdit: _editSchedule,
-                    onDelete: _confirmDeleteSchedule,
-                    formatDays: _formatDays,
-                    cardDecoration: _cardDecoration(),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// ===== STATS =====
-              _sectionHeader("STATS", "", () {}),
-              const SizedBox(height: 12),
-              _buildStats(),
-            ],
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
           ),
+          children: [
+            _header(),
+            const SizedBox(height: 24),
+
+            /// ===== VIALS =====
+            _sectionLabel("VIALS", action: "+ Add", onAction: _openAddVial),
+            const SizedBox(height: 12),
+            vials.isEmpty
+                ? _emptyCard(
+              icon: Icons.opacity,
+              iconColor: Colors.purpleAccent,
+              title: "No vials yet",
+              subtitle: "Add your first vial to start tracking",
+              buttonText: "+ Add Vial",
+              onPressed: _openAddVial,
+            )
+                : Column(
+              children: _groupVials(vials).entries.map((entry) {
+                return _ExpandableVialTile(
+                  compound: entry.key,
+                  vials: entry.value,
+                  onEdit: _editVial,
+                  onDelete: _confirmDeleteVial,
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: 24),
+
+            /// ===== SCHEDULES =====
+            _sectionLabel("SCHEDULES",
+                action: "+ Schedule", onAction: _openAddSchedule),
+            const SizedBox(height: 12),
+            schedules.isEmpty
+                ? _emptyCard(
+              icon: Icons.calendar_today,
+              iconColor: Colors.pinkAccent,
+              title: "No schedules yet",
+              subtitle: "Add a vial first, then create a schedule",
+              buttonText: "+ Add Schedule",
+              onPressed: _openAddSchedule,
+            )
+                : Column(
+              children:
+              _groupedSchedules(schedules).entries.map((entry) {
+                return _ExpandableScheduleTile(
+                  compound: entry.key,
+                  schedules: entry.value,
+                  onEdit: _editSchedule,
+                  onDelete: _confirmDeleteSchedule,
+                  formatDays: _formatDays,
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: 24),
+
+            /// ===== STATS =====
+            _sectionLabel("STATS"),
+            const SizedBox(height: 12),
+            _buildStats(),
+
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
   }
 
-  /// ===== STATS SECTION =====
+  // ===== HEADER =====
+  Widget _header() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          "Track",
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+        Row(
+          children: [
+            _headerIcon(Icons.flash_on, Colors.purple),
+            const SizedBox(width: 10),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Colors.purple, Colors.pink],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.chat_bubble_outline,
+                  color: Colors.white, size: 18),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _headerIcon(IconData icon, Color color) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, color: color, size: 18),
+    );
+  }
+
+  // ===== SECTION LABEL =====
+  Widget _sectionLabel(String text, {String? action, VoidCallback? onAction}) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 20,
+          height: 3,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.purple, Colors.pink],
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        const Spacer(),
+        if (action != null && onAction != null)
+          GestureDetector(
+            onTap: onAction,
+            child: Container(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(20),
+                border:
+                Border.all(color: Colors.purple.withOpacity(0.3)),
+              ),
+              child: Text(
+                action,
+                style: const TextStyle(
+                    color: Colors.purpleAccent, fontSize: 12),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ===== EMPTY CARD =====
+  Widget _emptyCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required String buttonText,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: _cardDecoration(),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          const SizedBox(height: 14),
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text(subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: onPressed,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(buttonText,
+                  style: const TextStyle(fontSize: 13)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===== STATS =====
   Widget _buildStats() {
     final schedules = ScheduleStore.instance.schedules;
-
-    // Build unique compound keys matching DoseLogStore format
     final compoundKeys = schedules
         .map((s) => "${s.compoundName}_${s.dosage}_${s.unit}")
         .toSet()
@@ -131,8 +269,6 @@ class _TrackScreenState extends State<TrackScreen> {
 
     final dosesThisWeek = DoseLogStore.instance.dosesThisWeek(compoundKeys);
     final streak = DoseLogStore.instance.currentStreak(compoundKeys);
-
-    // Compounds on cycle = unique compound names in active schedules
     final onCycle = schedules.map((s) => s.compoundName).toSet().toList();
 
     if (schedules.isEmpty) {
@@ -150,7 +286,6 @@ class _TrackScreenState extends State<TrackScreen> {
 
     return Column(
       children: [
-        // Row 1: Doses this week + Streak
         Row(
           children: [
             Expanded(
@@ -159,6 +294,7 @@ class _TrackScreenState extends State<TrackScreen> {
                 label: "This Week",
                 value: dosesThisWeek.toString(),
                 unit: "doses",
+                color: Colors.purple,
               ),
             ),
             const SizedBox(width: 12),
@@ -168,15 +304,12 @@ class _TrackScreenState extends State<TrackScreen> {
                 label: "Streak",
                 value: streak.toString(),
                 unit: "days",
-                accentColor: streak >= 7 ? Colors.orange : Colors.purple,
+                color: streak >= 7 ? Colors.orange : Colors.purple,
               ),
             ),
           ],
         ),
-
         const SizedBox(height: 12),
-
-        // Row 2: Compounds on cycle
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -186,17 +319,28 @@ class _TrackScreenState extends State<TrackScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.science, color: Colors.purple, size: 16),
-                  const SizedBox(width: 8),
-                  const Text(
-                    "ON CYCLE",
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.tealAccent.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.science,
+                        color: Colors.tealAccent, size: 15),
                   ),
+                  const SizedBox(width: 10),
+                  const Text("ON CYCLE",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11,
+                          letterSpacing: 1.1)),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               onCycle.isEmpty
-                  ? const Text("None", style: TextStyle(color: Colors.grey))
+                  ? const Text("None",
+                  style: TextStyle(color: Colors.grey))
                   : Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -210,11 +354,10 @@ class _TrackScreenState extends State<TrackScreen> {
                       border: Border.all(
                           color: Colors.purple.withOpacity(0.4)),
                     ),
-                    child: Text(
-                      name,
-                      style: const TextStyle(
-                          color: Colors.purple, fontSize: 13),
-                    ),
+                    child: Text(name,
+                        style: const TextStyle(
+                            color: Colors.purpleAccent,
+                            fontSize: 13)),
                   );
                 }).toList(),
               ),
@@ -230,7 +373,7 @@ class _TrackScreenState extends State<TrackScreen> {
     required String label,
     required String value,
     required String unit,
-    Color accentColor = Colors.purple,
+    required Color color,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -240,301 +383,83 @@ class _TrackScreenState extends State<TrackScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: accentColor, size: 16),
-              const SizedBox(width: 8),
-              Text(
-                label.toUpperCase(),
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 15),
               ),
+              const SizedBox(width: 8),
+              Text(label.toUpperCase(),
+                  style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 11,
+                      letterSpacing: 1.1)),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: accentColor,
-            ),
-          ),
-          Text(
-            unit,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-          ),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: color)),
+          Text(unit,
+              style:
+              const TextStyle(color: Colors.grey, fontSize: 12)),
         ],
       ),
     );
   }
 
-  /// ===== HEADER =====
-  Widget _header() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Text(
-          "Track",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Row(
-          children: [
-            Icon(Icons.flash_on, color: Colors.purple),
-            SizedBox(width: 10),
-            CircleAvatar(
-              backgroundColor: Colors.purple,
-              child: Icon(Icons.chat_bubble_outline),
-            )
-          ],
-        )
-      ],
-    );
-  }
-
-  /// ===== SECTION HEADER =====
-  Widget _sectionHeader(
-      String title, String action, VoidCallback onTap) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              width: 20,
-              height: 3,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.purple, Colors.pink],
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ],
-        ),
-        GestureDetector(
-          onTap: onTap,
-          child: Text(action),
-        ),
-      ],
-    );
-  }
-
-  /// ===== BIG EMPTY CARD (MATCHES YOUR DESIGN) =====
-  Widget _bigEmptyCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String buttonText,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: _cardDecoration(),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.purple),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-
-          /// BUTTON (FIXED STYLE)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2A2A2A),
-              foregroundColor: Colors.white,
-              padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            onPressed: onPressed,
-            child: Text(buttonText),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// ===== VIAL CARD =====
-  Widget _vialCard(Vial vial) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(vial.compoundName),
-          Text("${vial.dosage}${vial.unit}"),
-        ],
-      ),
-    );
-  }
-
-  String _formatDays(List<int> days) {
-    const names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    return days.map((d) => names[d - 1]).join(", ");
-  }
-
-  /// ===== SCHEDULE CARD =====
-  Widget _scheduleCard(Schedule s) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("${s.compoundName} (${s.dosage}${s.unit})"),
-          Text(_formatDays(s.daysOfWeek)), // assuming you're using days now
-        ],
-      ),
-    );
-  }
-
-  /// ===== CARD STYLE =====
+  // ===== CARD STYLE =====
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       gradient: const LinearGradient(
-        colors: [
-          Color(0xFF1A1A1A),
-          Color(0xFF222222),
-        ],
+        colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
       ),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(18),
     );
   }
 
-  /// ===== NAVIGATION =====
-  void _openAddVial() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AddVialScreen()),
-    );
-  }
+  // ===== NAVIGATION =====
+  void _openAddVial() => Navigator.push(context,
+      MaterialPageRoute(builder: (_) => const AddVialScreen()));
 
-  void _editVial(Vial vial) {
-    Navigator.push(
-      context,
+  void _editVial(Vial vial) => Navigator.push(context,
+      MaterialPageRoute(builder: (_) => AddVialScreen(existingVial: vial)));
+
+  void _openAddSchedule() => Navigator.push(context,
+      MaterialPageRoute(builder: (_) => const AddScheduleScreen()));
+
+  void _editSchedule(Schedule s) => Navigator.push(context,
       MaterialPageRoute(
-        builder: (_) => AddVialScreen(existingVial: vial),
-      ),
-    );
-  }
+          builder: (_) => AddScheduleScreen(existingSchedule: s)));
 
-  void _openAddSchedule() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AddScheduleScreen()),
-    );
-  }
-
-  /// ===== OPTIONS =====
-  void _showVialOptions(Vial vial) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: const Text("Edit"),
-            onTap: () {
-              Navigator.pop(context);
-              _editVial(vial);
-            },
-          ),
-          ListTile(
-            title: const Text("Delete",
-                style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              _confirmDeleteVial(vial);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _editSchedule(Schedule schedule) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddScheduleScreen(existingSchedule: schedule),
-      ),
-    );
-  }
-
-  void _showScheduleOptions(Schedule s) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: const Text("Edit"),
-            onTap: () {
-              Navigator.pop(context);
-              _editSchedule(s);
-            },
-          ),
-          ListTile(
-            title: const Text("Delete",
-                style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              _confirmDeleteSchedule(s);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// ===== CONFIRM DELETE =====
+  // ===== CONFIRM DELETE =====
   void _confirmDeleteVial(Vial vial) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text("Delete Vial"),
         content: Text("Remove ${vial.compoundName}?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel")),
+              child: const Text("Cancel",
+                  style: TextStyle(color: Colors.grey))),
           TextButton(
             onPressed: () {
               VialStore.instance.removeVial(vial);
               Navigator.pop(context);
             },
             child: const Text("Delete",
-                style: TextStyle(color: Colors.red)),
+                style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -546,95 +471,128 @@ class _TrackScreenState extends State<TrackScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text("Delete Schedule"),
         content: Text("Remove ${s.compoundName}?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel")),
+              child: const Text("Cancel",
+                  style: TextStyle(color: Colors.grey))),
           TextButton(
             onPressed: () {
               ScheduleStore.instance.removeSchedule(s);
               Navigator.pop(context);
             },
             child: const Text("Delete",
-                style: TextStyle(color: Colors.red)),
+                style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
     );
   }
 
+  // ===== GROUPING =====
   Map<String, List<Schedule>> _groupedSchedules(List<Schedule> schedules) {
     final Map<String, List<Schedule>> map = {};
-
     for (var s in schedules) {
       map.putIfAbsent(s.compoundName, () => []).add(s);
     }
-
     return map;
   }
+
   Map<String, List<Vial>> _groupVials(List<Vial> vials) {
     final Map<String, List<Vial>> map = {};
-
     for (var v in vials) {
       map.putIfAbsent(v.compoundName, () => []).add(v);
     }
-
     return map;
+  }
+
+  String _formatDays(List<int> days) {
+    const names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    return days.map((d) => names[d - 1]).join(", ");
   }
 }
 
+// ===== EXPANDABLE VIAL TILE =====
 class _ExpandableVialTile extends StatefulWidget {
   final String compound;
   final List<Vial> vials;
-  final BoxDecoration cardDecoration;
   final Function(Vial) onEdit;
   final Function(Vial) onDelete;
 
   const _ExpandableVialTile({
     required this.compound,
     required this.vials,
-    required this.cardDecoration,
     required this.onEdit,
     required this.onDelete,
   });
 
   @override
-  State<_ExpandableVialTile> createState() =>
-      _ExpandableVialTileState();
+  State<_ExpandableVialTile> createState() => _ExpandableVialTileState();
 }
 
 class _ExpandableVialTileState extends State<_ExpandableVialTile> {
   bool expanded = false;
 
+  BoxDecoration _cardDecoration() => BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+    ),
+    borderRadius: BorderRadius.circular(18),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// MAIN TILE (compound name)
+        // Header tile
         GestureDetector(
           onTap: () => setState(() => expanded = !expanded),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: widget.cardDecoration,
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: _cardDecoration(),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(widget.compound),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.purpleAccent.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.opacity,
+                      color: Colors.purpleAccent, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.compound,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(
+                  "${widget.vials.length} vial${widget.vials.length != 1 ? 's' : ''}",
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const SizedBox(width: 8),
                 Icon(
                   expanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
                   color: Colors.grey,
+                  size: 20,
                 ),
               ],
             ),
           ),
         ),
 
-        /// EXPANDED DOSAGES
+        // Expanded dosages
         if (expanded)
           Column(
             children: _groupByDosage(widget.vials).entries.map((entry) {
@@ -642,52 +600,40 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
               final vials = entry.value;
 
               return Dismissible(
-                key: Key("${widget.compound}_$dosageKey"),
-
+                key: Key("vial_${widget.compound}_$dosageKey"),
                 direction: DismissDirection.horizontal,
-
-                background: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.edit, color: Colors.white),
-                ),
-
-                secondaryBackground: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.centerRight,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-
+                background: _swipeBackground(
+                    Colors.blue, Icons.edit, Alignment.centerLeft),
+                secondaryBackground: _swipeBackground(
+                    Colors.red, Icons.delete, Alignment.centerRight),
                 confirmDismiss: (direction) async {
                   if (direction == DismissDirection.startToEnd) {
                     widget.onEdit(vials.first);
-                    return false;
                   } else {
                     widget.onDelete(vials.first);
-                    return false;
                   }
+                  return false;
                 },
-
                 child: Container(
-                  margin: const EdgeInsets.only(
-                      bottom: 12, left: 8, right: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: widget.cardDecoration,
+                  margin: const EdgeInsets.only(bottom: 10, left: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF161616),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                        color: Colors.purple.withOpacity(0.15)),
+                  ),
                   child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(dosageKey),
+                      const Icon(Icons.circle,
+                          color: Colors.purple, size: 8),
+                      const SizedBox(width: 10),
+                      Text(dosageKey,
+                          style: const TextStyle(fontSize: 14)),
+                      const Spacer(),
+                      const Icon(Icons.swipe,
+                          color: Colors.grey, size: 14),
                     ],
                   ),
                 ),
@@ -700,23 +646,21 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
 
   Map<String, List<Vial>> _groupByDosage(List<Vial> vials) {
     final Map<String, List<Vial>> map = {};
-
     for (var v in vials) {
       final key = "${v.dosage}${v.unit}";
       map.putIfAbsent(key, () => []).add(v);
     }
-
     return map;
   }
 }
 
+// ===== EXPANDABLE SCHEDULE TILE =====
 class _ExpandableScheduleTile extends StatefulWidget {
   final String compound;
   final List<Schedule> schedules;
   final Function(Schedule) onEdit;
   final Function(Schedule) onDelete;
   final String Function(List<int>) formatDays;
-  final BoxDecoration cardDecoration;
 
   const _ExpandableScheduleTile({
     required this.compound,
@@ -724,7 +668,6 @@ class _ExpandableScheduleTile extends StatefulWidget {
     required this.onEdit,
     required this.onDelete,
     required this.formatDays,
-    required this.cardDecoration,
   });
 
   @override
@@ -732,48 +675,70 @@ class _ExpandableScheduleTile extends StatefulWidget {
       _ExpandableScheduleTileState();
 }
 
-class _ExpandableScheduleTileState
-    extends State<_ExpandableScheduleTile> {
+class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
   bool expanded = false;
+
+  BoxDecoration _cardDecoration() => BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+    ),
+    borderRadius: BorderRadius.circular(18),
+  );
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// MAIN TILE (UNCHANGED STYLE)
+        // Header tile
         GestureDetector(
-          onTap: () {
-            setState(() {
-              expanded = !expanded;
-            });
-          },
+          onTap: () => setState(() => expanded = !expanded),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: widget.cardDecoration,
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: _cardDecoration(),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(widget.compound),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.pinkAccent.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.calendar_month,
+                      color: Colors.pinkAccent, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.compound,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(
+                  "${widget.schedules.length} schedule${widget.schedules.length != 1 ? 's' : ''}",
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const SizedBox(width: 8),
                 Icon(
                   expanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
                   color: Colors.grey,
+                  size: 20,
                 ),
               ],
             ),
           ),
         ),
 
-        /// EXPANDED LIST
+        // Expanded schedules
         if (expanded)
           Column(
             children: _groupByDosage(widget.schedules).entries.map((entry) {
               final dosageKey = entry.key;
               final schedules = entry.value;
-
-              /// Merge all days for same dosage
               final allDays = schedules
                   .expand((s) => s.daysOfWeek)
                   .toSet()
@@ -781,51 +746,51 @@ class _ExpandableScheduleTileState
                 ..sort();
 
               return Dismissible(
-                key: Key("${widget.compound}_$dosageKey"),
-
+                key: Key("sched_${widget.compound}_$dosageKey"),
                 direction: DismissDirection.horizontal,
-
-                background: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.edit, color: Colors.white),
-                ),
-
-                secondaryBackground: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.centerRight,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-
+                background: _swipeBackground(
+                    Colors.blue, Icons.edit, Alignment.centerLeft),
+                secondaryBackground: _swipeBackground(
+                    Colors.red, Icons.delete, Alignment.centerRight),
                 confirmDismiss: (direction) async {
                   if (direction == DismissDirection.startToEnd) {
                     widget.onEdit(schedules.first);
-                    return false;
                   } else {
                     widget.onDelete(schedules.first);
-                    return false;
                   }
+                  return false;
                 },
-
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 12, left: 8, right: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: widget.cardDecoration,
+                  margin: const EdgeInsets.only(bottom: 10, left: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF161616),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                        color: Colors.pink.withOpacity(0.15)),
+                  ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(dosageKey),
-                      Text(widget.formatDays(allDays)),
+                      const Icon(Icons.circle,
+                          color: Colors.pinkAccent, size: 8),
+                      const SizedBox(width: 10),
+                      Text(dosageKey,
+                          style: const TextStyle(fontSize: 14)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          widget.formatDays(allDays),
+                          style: const TextStyle(
+                              color: Colors.pinkAccent, fontSize: 11),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -835,14 +800,28 @@ class _ExpandableScheduleTileState
       ],
     );
   }
+
   Map<String, List<Schedule>> _groupByDosage(List<Schedule> schedules) {
     final Map<String, List<Schedule>> map = {};
-
     for (var s in schedules) {
       final key = "${s.dosage}${s.unit}";
       map.putIfAbsent(key, () => []).add(s);
     }
-
     return map;
   }
+}
+
+// ===== SHARED SWIPE BACKGROUND =====
+Widget _swipeBackground(
+    Color color, IconData icon, AlignmentGeometry alignment) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 10, left: 12),
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    alignment: alignment,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Icon(icon, color: Colors.white, size: 20),
+  );
 }

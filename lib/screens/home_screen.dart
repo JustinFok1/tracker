@@ -183,20 +183,30 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _nextDoseCard(BuildContext context) {
     final schedules = ScheduleStore.instance.schedules;
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
 
-    // Find next scheduled compound
+    // Find next unchecked dose — today first, then future days
     String? nextCompound;
     String? nextDose;
+    bool isToday = false;
+
     for (int i = 0; i <= 7; i++) {
-      final day = now.add(Duration(days: i));
-      final todaySchedules = schedules.where((s) =>
-      !day.isBefore(s.startDate) && s.daysOfWeek.contains(day.weekday));
-      if (todaySchedules.isNotEmpty) {
-        final s = todaySchedules.first;
-        nextCompound = s.compoundName;
-        nextDose = "${s.dosage}${s.unit}";
-        break;
+      final day = today.add(Duration(days: i));
+      final daySchedules = schedules.where((s) =>
+      !day.isBefore(DateTime(s.startDate.year, s.startDate.month, s.startDate.day)) &&
+          s.daysOfWeek.contains(day.weekday));
+
+      for (final s in daySchedules) {
+        final key = "${s.compoundName}_${s.dosage}_${s.unit}";
+        final taken = DoseLogStore.instance.isTaken(key, day);
+        if (!taken) {
+          nextCompound = s.compoundName;
+          nextDose = "${s.dosage}${s.unit}";
+          isToday = i == 0;
+          break;
+        }
       }
+      if (nextCompound != null) break;
     }
 
     return Container(
@@ -241,8 +251,27 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ] else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: isToday
+                    ? Colors.orange.withOpacity(0.15)
+                    : Colors.purple.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                isToday ? "TODAY" : "UPCOMING",
+                style: TextStyle(
+                  color: isToday ? Colors.orange : Colors.purple,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
             Text(
-              nextCompound,
+              nextCompound!,
               style: const TextStyle(
                   fontSize: 15, fontWeight: FontWeight.bold),
               maxLines: 2,
