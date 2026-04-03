@@ -20,19 +20,22 @@ class VialAdapter extends TypeAdapter<Vial> {
       compoundName: fields[0] as String,
       dosage: fields[1] as double,
       unit: fields[2] as String,
+      totalDoses: fields[3] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Vial obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.compoundName)
       ..writeByte(1)
       ..write(obj.dosage)
       ..writeByte(2)
-      ..write(obj.unit);
+      ..write(obj.unit)
+      ..writeByte(3)
+      ..write(obj.totalDoses);
   }
 
   @override

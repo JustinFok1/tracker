@@ -6,6 +6,7 @@ import 'screens/main_screen.dart';
 import 'models/vial.dart';
 import 'models/schedule.dart';
 import 'data/dose_log_store.dart';
+import 'data/vial_inventory_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,7 @@ void main() async {
   await Hive.openBox<Schedule>('schedules');
   await Hive.openBox<bool>('dose_logs');
   await DoseLogStore.instance.init();
+  await VialInventoryStore.instance.init();
 
   runApp(const MyApp());
 }

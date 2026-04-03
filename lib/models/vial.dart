@@ -13,9 +13,13 @@ class Vial {
   @HiveField(2)
   final String unit;
 
+  @HiveField(3)
+  final int? totalDoses;
+
   Vial({
     required this.compoundName,
     required this.dosage,
     required this.unit,
+    this.totalDoses,
   });
 }

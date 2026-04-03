@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/vial_store.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
+import '../data/vial_inventory_store.dart';
 import '../models/vial.dart';
 import '../models/schedule.dart';
 import 'add_vial_screen.dart';
@@ -21,6 +22,7 @@ class _TrackScreenState extends State<TrackScreen> {
     VialStore.instance.addListener(_refresh);
     ScheduleStore.instance.addListener(_refresh);
     DoseLogStore.instance.addListener(_refresh);
+    VialInventoryStore.instance.addListener(_refresh);
   }
 
   @override
@@ -28,6 +30,7 @@ class _TrackScreenState extends State<TrackScreen> {
     VialStore.instance.removeListener(_refresh);
     ScheduleStore.instance.removeListener(_refresh);
     DoseLogStore.instance.removeListener(_refresh);
+    VialInventoryStore.instance.removeListener(_refresh);
     super.dispose();
   }
 
@@ -50,16 +53,16 @@ class _TrackScreenState extends State<TrackScreen> {
             _header(),
             const SizedBox(height: 24),
 
-            /// ===== VIALS =====
-            _sectionLabel("VIALS", action: "+ Add", onAction: _openAddVial),
+            /// ===== COMPOUNDS =====
+            _sectionLabel("COMPOUNDS", action: "+ Add", onAction: _openAddVial),
             const SizedBox(height: 12),
             vials.isEmpty
                 ? _emptyCard(
               icon: Icons.opacity,
               iconColor: Colors.purpleAccent,
-              title: "No vials yet",
-              subtitle: "Add your first vial to start tracking",
-              buttonText: "+ Add Vial",
+              title: "No compounds yet",
+              subtitle: "Add your first compound to start tracking",
+              buttonText: "+ Add Compound",
               onPressed: _openAddVial,
             )
                 : Column(
@@ -84,7 +87,7 @@ class _TrackScreenState extends State<TrackScreen> {
               icon: Icons.calendar_today,
               iconColor: Colors.pinkAccent,
               title: "No schedules yet",
-              subtitle: "Add a vial first, then create a schedule",
+              subtitle: "Add a compound first, then create a schedule",
               buttonText: "+ Add Schedule",
               onPressed: _openAddSchedule,
             )
@@ -446,7 +449,7 @@ class _TrackScreenState extends State<TrackScreen> {
         backgroundColor: const Color(0xFF1A1A1A),
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Delete Vial"),
+        title: const Text("Delete Compound"),
         content: Text("Remove ${vial.compoundName}?"),
         actions: [
           TextButton(
@@ -576,7 +579,7 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
                   ),
                 ),
                 Text(
-                  "${widget.vials.length} vial${widget.vials.length != 1 ? 's' : ''}",
+                  "${widget.vials.length} compound${widget.vials.length != 1 ? 's' : ''}",
                   style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
                 const SizedBox(width: 8),
@@ -592,15 +595,16 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
           ),
         ),
 
-        // Expanded dosages
+        // Expanded entries
         if (expanded)
           Column(
-            children: _groupByDosage(widget.vials).entries.map((entry) {
-              final dosageKey = entry.key;
-              final vials = entry.value;
+            children: widget.vials.asMap().entries.map((entry) {
+              final index = entry.key;
+              final vial = entry.value;
+              final dosageKey = "${vial.dosage}${vial.unit}";
 
               return Dismissible(
-                key: Key("vial_${widget.compound}_$dosageKey"),
+                key: Key("vial_${widget.compound}_${index}_$dosageKey"),
                 direction: DismissDirection.horizontal,
                 background: _swipeBackground(
                     Colors.blue, Icons.edit, Alignment.centerLeft),
@@ -608,34 +612,15 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
                     Colors.red, Icons.delete, Alignment.centerRight),
                 confirmDismiss: (direction) async {
                   if (direction == DismissDirection.startToEnd) {
-                    widget.onEdit(vials.first);
+                    widget.onEdit(vial);
                   } else {
-                    widget.onDelete(vials.first);
+                    widget.onDelete(vial);
                   }
                   return false;
                 },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 10, left: 12),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF161616),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                        color: Colors.purple.withOpacity(0.15)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.circle,
-                          color: Colors.purple, size: 8),
-                      const SizedBox(width: 10),
-                      Text(dosageKey,
-                          style: const TextStyle(fontSize: 14)),
-                      const Spacer(),
-                      const Icon(Icons.swipe,
-                          color: Colors.grey, size: 14),
-                    ],
-                  ),
+                child: _VialDosageRow(
+                  vial: vial,
+                  dosageKey: dosageKey,
                 ),
               );
             }).toList(),
@@ -644,14 +629,6 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
     );
   }
 
-  Map<String, List<Vial>> _groupByDosage(List<Vial> vials) {
-    final Map<String, List<Vial>> map = {};
-    for (var v in vials) {
-      final key = "${v.dosage}${v.unit}";
-      map.putIfAbsent(key, () => []).add(v);
-    }
-    return map;
-  }
 }
 
 // ===== EXPANDABLE SCHEDULE TILE =====
@@ -808,6 +785,72 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
       map.putIfAbsent(key, () => []).add(s);
     }
     return map;
+  }
+}
+
+// ===== VIAL DOSAGE ROW =====
+class _VialDosageRow extends StatelessWidget {
+  final Vial vial;
+  final String dosageKey;
+
+  const _VialDosageRow({required this.vial, required this.dosageKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final remaining = VialInventoryStore.instance.getRemaining(vial);
+
+    Color stockColor = Colors.purple;
+    String? stockLabel;
+
+    if (remaining != null && vial.totalDoses != null) {
+      final pct = remaining / vial.totalDoses!;
+      if (pct <= 0.0) {
+        stockColor = Colors.redAccent;
+        stockLabel = "Empty";
+      } else if (pct <= 0.2 || remaining <= 3) {
+        stockColor = Colors.orange;
+        stockLabel = "$remaining left";
+      } else if (pct <= 0.5) {
+        stockColor = Colors.amber;
+        stockLabel = "$remaining left";
+      } else {
+        stockColor = Colors.greenAccent;
+        stockLabel = "$remaining left";
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10, left: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.purple.withOpacity(0.15)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.circle, color: stockColor, size: 8),
+          const SizedBox(width: 10),
+          Text(dosageKey, style: const TextStyle(fontSize: 14)),
+          const Spacer(),
+          if (stockLabel != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: stockColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                stockLabel,
+                style: TextStyle(color: stockColor, fontSize: 11),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          const Icon(Icons.swipe, color: Colors.grey, size: 14),
+        ],
+      ),
+    );
   }
 }
 

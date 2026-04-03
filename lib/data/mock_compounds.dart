@@ -13,17 +13,17 @@ final List<Compound> allCompounds = [
   ),
   Compound(
     name: "Testosterone Enanthate",
-    category: "Hormone",
+    category: "Injectable",
     description: "Long-acting testosterone ester",
   ),
   Compound(
     name: "MK-677",
-    category: "Secretagogue",
+    category: "Oral",
     description: "Oral GH secretagogue",
   ),
   Compound(
     name: "Anavar",
-    category: "Oral Steroid",
+    category: "Oral",
     description: "Mild anabolic compound",
   ),
 ];

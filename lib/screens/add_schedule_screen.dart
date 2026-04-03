@@ -96,7 +96,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
             const SizedBox(height: 32),
 
             // Vial selector
-            _fieldLabel("Select Vial"),
+            _fieldLabel("Select Compound"),
             const SizedBox(height: 8),
             _vialDropdown(vials),
 
@@ -146,7 +146,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Vial>(
           dropdownColor: const Color(0xFF1A1A1A),
-          hint: const Text("Select a vial",
+          hint: const Text("Select a compound",
               style: TextStyle(color: Colors.grey)),
           value: selectedVial,
           isExpanded: true,

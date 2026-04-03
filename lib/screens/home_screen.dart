@@ -127,26 +127,33 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Row(
           children: [
-            _headerIcon(Icons.flash_on, Colors.purple),
+            _headerIcon(Icons.flash_on, Colors.purple, onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AddScheduleScreen()));
+            }),
             const SizedBox(width: 10),
             _headerIcon(Icons.calendar_today, Colors.white70, onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const CalendarScreen()));
             }),
             const SizedBox(width: 10),
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.purple, Colors.pink],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            GestureDetector(
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const ResearchScreen())),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.purple, Colors.pink],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                borderRadius: BorderRadius.circular(12),
+                child: const Icon(Icons.science,
+                    color: Colors.white, size: 18),
               ),
-              child: const Icon(Icons.chat_bubble_outline,
-                  color: Colors.white, size: 18),
             ),
           ],
         ),

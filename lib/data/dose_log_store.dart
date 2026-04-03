@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'vial_inventory_store.dart';
 
 class DoseLogStore extends ChangeNotifier {
   static final DoseLogStore instance = DoseLogStore._internal();
@@ -23,6 +24,11 @@ class DoseLogStore extends ChangeNotifier {
     final key = _key(compound, date);
     final current = _box?.get(key) ?? false;
     _box?.put(key, !current);
+    if (!current) {
+      VialInventoryStore.instance.incrementUsed(compound);
+    } else {
+      VialInventoryStore.instance.decrementUsed(compound);
+    }
     notifyListeners();
   }
 
