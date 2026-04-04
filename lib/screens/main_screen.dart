@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
 
   List<BodyMetric> get _metrics => BodyMetricStore.instance.metrics;

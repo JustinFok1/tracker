@@ -26,7 +26,7 @@ class _DoseCardState extends State<DoseCard> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   List<Schedule> _getTodaySchedules() {
     final today = DateTime.now().weekday;

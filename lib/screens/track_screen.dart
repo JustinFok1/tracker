@@ -35,7 +35,7 @@ class _TrackScreenState extends State<TrackScreen> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   @override
   Widget build(BuildContext context) {

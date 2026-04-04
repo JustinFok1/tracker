@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   @override
   Widget build(BuildContext context) {

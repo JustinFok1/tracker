@@ -593,11 +593,12 @@ class _AddVialScreenState extends State<AddVialScreen> {
   }
 
   void _saveVial() {
-    if (selectedCompound == null || vialAmountController.text.isEmpty) return;
+    final dosage = double.tryParse(vialAmountController.text);
+    if (selectedCompound == null || dosage == null || dosage <= 0) return;
 
     final newVial = Vial(
       compoundName: selectedCompound!,
-      dosage: double.parse(vialAmountController.text),
+      dosage: dosage,
       unit: _isInjectable ? 'ml' : _isOral ? 'pills' : selectedUnit,
       totalDoses: _totalDosesToSave,
     );
@@ -640,7 +641,7 @@ class _CompoundPickerSheetState extends State<_CompoundPickerSheet> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   List<Compound> get _allCompounds => [
         ...allCompounds,

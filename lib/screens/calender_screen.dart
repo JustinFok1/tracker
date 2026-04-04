@@ -30,7 +30,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   List<Schedule> _getSchedulesForDay(DateTime day) {
     return ScheduleStore.instance.schedules.where((s) {
@@ -83,7 +83,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () { if (Navigator.canPop(context)) Navigator.pop(context); },
             child: Container(
               width: 38,
               height: 38,

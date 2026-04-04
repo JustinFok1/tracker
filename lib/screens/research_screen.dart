@@ -28,7 +28,7 @@ class _ResearchScreenState extends State<ResearchScreen> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refresh() { if (mounted) setState(() {}); }
 
   List<Compound> get _allCompounds => [
         ...allCompounds,
