@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import '../models/body_metric.dart';
 import 'home_screen.dart';
 import 'track_screen.dart';
+import 'history_screen.dart';
 import 'body_metrics_screen.dart';
 import '../widgets/bottom_nav.dart';
 
@@ -916,14 +917,15 @@ class _LogSheetState extends State<_LogSheet> {
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
 
-  final screens = [
-    const HomeScreen(),
-    const TrackScreen(),
-    const _ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const HomeScreen(),
+      const TrackScreen(),
+      const HistoryScreen(),
+      const _ProfileScreen(),
+    ];
+
     return Scaffold(
       backgroundColor: context.colors.background,
 

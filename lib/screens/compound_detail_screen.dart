@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../models/compound.dart';
+import 'add_vial_screen.dart';
 
 class CompoundDetailScreen extends StatelessWidget {
   final Compound compound;
@@ -953,7 +954,15 @@ class CompoundDetailScreen extends StatelessWidget {
         border: Border(top: BorderSide(color: context.colors.card)),
       ),
       child: GestureDetector(
-        onTap: () => Navigator.pop(context),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddVialScreen(initialCompound: compound.name),
+            ),
+          );
+        },
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -967,7 +976,7 @@ class CompoundDetailScreen extends StatelessWidget {
           ),
           child: const Center(
             child: Text(
-              "Add to Tracker",
+              "Add Compound",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,

@@ -14,6 +14,7 @@ class BottomNav extends StatelessWidget {
   static const _items = [
     _NavItem(icon: Icons.home_rounded, label: 'Home'),
     _NavItem(icon: Icons.bar_chart_rounded, label: 'Track'),
+    _NavItem(icon: Icons.history_rounded, label: 'History'),
     _NavItem(icon: Icons.person_rounded, label: 'Profile'),
   ];
 

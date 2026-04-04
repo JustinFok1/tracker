@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/dose_card.dart';
 import 'calender_screen.dart';
+import 'history_screen.dart';
 import 'research_screen.dart';
 import 'add_schedule_screen.dart';
 import 'body_metrics_screen.dart';
@@ -57,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: "Dose History",
                 subtitle: "View and edit your dosing history",
                 onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const CalendarScreen())),
+                    MaterialPageRoute(builder: (_) => const HistoryScreen())),
               ),
               const SizedBox(height: 10),
               _navTile(

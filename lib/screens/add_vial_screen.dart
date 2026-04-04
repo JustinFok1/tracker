@@ -7,8 +7,9 @@ import '../models/vial.dart';
 
 class AddVialScreen extends StatefulWidget {
   final Vial? existingVial;
+  final String? initialCompound;
 
-  const AddVialScreen({super.key, this.existingVial});
+  const AddVialScreen({super.key, this.existingVial, this.initialCompound});
 
   @override
   State<AddVialScreen> createState() => _AddVialScreenState();
@@ -41,6 +42,8 @@ class _AddVialScreenState extends State<AddVialScreen> {
       selectedCompound = widget.existingVial!.compoundName;
       vialAmountController.text = widget.existingVial!.dosage.toString();
       selectedUnit = widget.existingVial!.unit;
+    } else if (widget.initialCompound != null) {
+      selectedCompound = widget.initialCompound;
     }
   }
 
