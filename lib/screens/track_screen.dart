@@ -815,7 +815,7 @@ class _VialDosageRow extends StatelessWidget {
         stockColor = Colors.amber;
         stockLabel = "$remaining left";
       } else {
-        stockColor = Colors.greenAccent;
+        stockColor = context.colors.success;
         stockLabel = "$remaining left";
       }
     }

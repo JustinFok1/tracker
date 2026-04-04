@@ -511,53 +511,54 @@ class _AddVialScreenState extends State<AddVialScreen> {
   }
 
   Widget _compoundDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: context.colors.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: context.colors.border),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          dropdownColor: context.colors.card,
-          hint: Text("Select Compound",
-              style: TextStyle(color: context.colors.textSecondary)),
-          value: selectedCompound,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          items: allCompounds.map((c) {
-            return DropdownMenuItem<String>(
-              value: c.name,
-              child: Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(c.name, style: const TextStyle(fontSize: 14)),
-                        Text(c.category,
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 11)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-          onChanged: (value) => setState(() => selectedCompound = value),
+    return GestureDetector(
+      onTap: _openCompoundPicker,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: context.colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: context.colors.border),
         ),
+        child: Row(
+          children: [
+            if (selectedCompound != null) ...[
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.purple,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(
+                selectedCompound ?? "Search compounds...",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: selectedCompound != null
+                      ? context.colors.textPrimary
+                      : context.colors.textSecondary,
+                ),
+              ),
+            ),
+            const Icon(Icons.search, color: Colors.grey, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openCompoundPicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _CompoundPickerSheet(
+        selected: selectedCompound,
+        onSelected: (name) => setState(() => selectedCompound = name),
       ),
     );
   }
@@ -603,5 +604,210 @@ class _AddVialScreenState extends State<AddVialScreen> {
     }
 
     Navigator.pop(context);
+  }
+}
+
+// ===== COMPOUND PICKER SHEET =====
+class _CompoundPickerSheet extends StatefulWidget {
+  final String? selected;
+  final ValueChanged<String> onSelected;
+
+  const _CompoundPickerSheet({required this.selected, required this.onSelected});
+
+  @override
+  State<_CompoundPickerSheet> createState() => _CompoundPickerSheetState();
+}
+
+class _CompoundPickerSheetState extends State<_CompoundPickerSheet> {
+  final _controller = TextEditingController();
+  String _query = '';
+
+  List<Compound> get _filtered {
+    if (_query.isEmpty) return allCompounds;
+    final q = _query.toLowerCase();
+    return allCompounds.where((c) =>
+      c.name.toLowerCase().contains(q) ||
+      (c.genericName?.toLowerCase().contains(q) ?? false) ||
+      c.category.toLowerCase().contains(q),
+    ).toList();
+  }
+
+  Color _categoryColor(String cat) {
+    switch (cat) {
+      case 'Peptide':    return Colors.tealAccent;
+      case 'Injectable': return Colors.orangeAccent;
+      case 'Oral':       return Colors.pinkAccent;
+      default:           return Colors.purple;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _filtered;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: context.colors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          const SizedBox(height: 12),
+          Container(
+            width: 40, height: 4,
+            decoration: BoxDecoration(
+              color: context.colors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                const Text("Select Compound",
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(Icons.close, size: 20, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: context.colors.card,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: context.colors.border),
+              ),
+              child: TextField(
+                controller: _controller,
+                autofocus: true,
+                onChanged: (v) => setState(() => _query = v),
+                style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
+                decoration: InputDecoration(
+                  icon: const Icon(Icons.search, color: Colors.grey, size: 18),
+                  hintText: "Search by name, category...",
+                  hintStyle: TextStyle(color: context.colors.textSecondary),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Count
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "${filtered.length} compound${filtered.length != 1 ? 's' : ''}",
+                style: const TextStyle(color: Colors.grey, fontSize: 11,
+                    fontWeight: FontWeight.bold, letterSpacing: 1.1),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // List
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: filtered.length,
+              itemBuilder: (context, i) {
+                final c = filtered[i];
+                final color = _categoryColor(c.category);
+                final isSelected = c.name == widget.selected;
+
+                return GestureDetector(
+                  onTap: () {
+                    widget.onSelected(c.name);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.purple.withValues(alpha: 0.12)
+                          : context.colors.cardAlt,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.purple.withValues(alpha: 0.4)
+                            : context.colors.border2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8, height: 8,
+                          decoration: BoxDecoration(
+                            color: color, shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(c.name,
+                                  style: const TextStyle(
+                                      fontSize: 14, fontWeight: FontWeight.w600)),
+                              if (c.genericName != null)
+                                Text(c.genericName!,
+                                    style: const TextStyle(
+                                        color: Colors.grey, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(c.category,
+                              style: TextStyle(
+                                  color: color, fontSize: 10,
+                                  fontWeight: FontWeight.w600)),
+                        ),
+                        if (isSelected) ...[
+                          const SizedBox(width: 8),
+                          const Icon(Icons.check_circle,
+                              color: Colors.purpleAccent, size: 16),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
   }
 }

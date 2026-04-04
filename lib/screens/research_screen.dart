@@ -23,9 +23,11 @@ class _ResearchScreenState extends State<ResearchScreen> {
 
   List<Compound> get filteredCompounds {
     return allCompounds.where((c) {
+      final q = searchQuery.toLowerCase();
       final matchesSearch =
-          c.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              c.category.toLowerCase().contains(searchQuery.toLowerCase());
+          c.name.toLowerCase().contains(q) ||
+              c.category.toLowerCase().contains(q) ||
+              (c.genericName?.toLowerCase().contains(q) ?? false);
       final matchesCategory =
           selectedCategory == null || c.category == selectedCategory;
       return matchesSearch && matchesCategory;
@@ -40,8 +42,6 @@ class _ResearchScreenState extends State<ResearchScreen> {
         return Colors.orangeAccent;
       case 'Oral':
         return Colors.pinkAccent;
-      case 'SARM':
-        return Colors.blueAccent;
       default:
         return Colors.purple;
     }
@@ -55,8 +55,6 @@ class _ResearchScreenState extends State<ResearchScreen> {
         return Icons.colorize_outlined;
       case 'Oral':
         return Icons.medication;
-      case 'SARM':
-        return Icons.science;
       default:
         return Icons.science;
     }
@@ -285,6 +283,14 @@ class _ResearchScreenState extends State<ResearchScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      if (compound.genericName != null)
+                        Text(
+                          compound.genericName!,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
+                        ),
                       const SizedBox(height: 4),
                       Row(
                         children: [

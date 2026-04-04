@@ -69,13 +69,13 @@ class _DoseCardState extends State<DoseCard> {
                 height: 28,
                 decoration: BoxDecoration(
                   color: allDone
-                      ? Colors.greenAccent.withValues(alpha: 0.12)
+                      ? context.colors.success.withValues(alpha: 0.12)
                       : Colors.purple.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   allDone ? Icons.check_circle : Icons.access_time,
-                  color: allDone ? Colors.greenAccent : Colors.purple,
+                  color: allDone ? context.colors.success : Colors.purple,
                   size: 15,
                 ),
               ),
@@ -83,7 +83,7 @@ class _DoseCardState extends State<DoseCard> {
               Text(
                 "TODAY",
                 style: TextStyle(
-                  color: allDone ? Colors.greenAccent : Colors.grey,
+                  color: allDone ? context.colors.success : Colors.grey,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.1,
@@ -121,7 +121,7 @@ class _DoseCardState extends State<DoseCard> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: allDone ? Colors.greenAccent : context.colors.textPrimary,
+                    color: allDone ? context.colors.success : context.colors.textPrimary,
                   ),
                 ),
                 Text(
@@ -141,7 +141,7 @@ class _DoseCardState extends State<DoseCard> {
                 minHeight: 4,
                 backgroundColor: context.colors.progressBg,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  allDone ? Colors.greenAccent : Colors.purple,
+                  allDone ? context.colors.success : Colors.purple,
                 ),
               ),
             ),
@@ -165,7 +165,7 @@ class _DoseCardState extends State<DoseCard> {
                               ? Icons.check_circle
                               : Icons.circle_outlined,
                           color: isTaken
-                              ? Colors.greenAccent
+                              ? context.colors.success
                               : Colors.grey,
                           size: 13,
                         ),

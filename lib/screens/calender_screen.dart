@@ -179,7 +179,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: all
-                      ? Colors.greenAccent
+                      ? context.colors.success
                       : some
                       ? Colors.orange
                       : Colors.purple,
@@ -224,7 +224,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: taken == schedules.length
-                    ? Colors.greenAccent.withValues(alpha: 0.15)
+                    ? context.colors.success.withValues(alpha: 0.15)
                     : Colors.purple.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -233,7 +233,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   color: taken == schedules.length
-                      ? Colors.greenAccent
+                      ? context.colors.success
                       : Colors.purpleAccent,
                 ),
               ),
@@ -287,12 +287,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: taken
-                  ? Colors.greenAccent.withValues(alpha: 0.07)
+                  ? context.colors.success.withValues(alpha: 0.07)
                   : context.colors.card,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: taken
-                    ? Colors.greenAccent.withValues(alpha: 0.3)
+                    ? context.colors.success.withValues(alpha: 0.3)
                     : context.colors.border,
               ),
             ),
@@ -304,13 +304,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   height: 36,
                   decoration: BoxDecoration(
                     color: taken
-                        ? Colors.greenAccent.withValues(alpha: 0.12)
+                        ? context.colors.success.withValues(alpha: 0.12)
                         : Colors.purple.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     Icons.science,
-                    color: taken ? Colors.greenAccent : Colors.purpleAccent,
+                    color: taken ? context.colors.success : Colors.purpleAccent,
                     size: 18,
                   ),
                 ),
@@ -349,8 +349,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   height: 30,
                   decoration: BoxDecoration(
                     gradient: taken
-                        ? const LinearGradient(
-                      colors: [Colors.greenAccent, Colors.teal],
+                        ? LinearGradient(
+                      colors: [context.colors.success, Colors.teal],
                     )
                         : null,
                     color: taken ? null : context.colors.border,
