@@ -5,6 +5,7 @@ import '../widgets/section_tile.dart';
 import 'calender_screen.dart';
 import 'research_screen.dart';
 import 'add_schedule_screen.dart';
+import 'body_metrics_screen.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
 
@@ -77,6 +78,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(
                         builder: (_) => const AddScheduleScreen())),
+              ),
+              const SizedBox(height: 10),
+              _navTile(
+                icon: Icons.monitor_weight_outlined,
+                iconColor: Colors.tealAccent,
+                title: "Body Metrics",
+                subtitle: "Track weight and body composition",
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (_) => const BodyMetricsScreen())),
               ),
               const SizedBox(height: 24),
             ],

@@ -5,8 +5,10 @@ import 'theme/app_theme.dart';
 import 'screens/main_screen.dart';
 import 'models/vial.dart';
 import 'models/schedule.dart';
+import 'models/body_metric.dart';
 import 'data/dose_log_store.dart';
 import 'data/vial_inventory_store.dart';
+import 'data/body_metric_store.dart';
 import 'data/theme_store.dart';
 import 'screens/onboarding_screen.dart';
 
@@ -17,6 +19,7 @@ void main() async {
 
   Hive.registerAdapter(VialAdapter());
   Hive.registerAdapter(ScheduleAdapter());
+  Hive.registerAdapter(BodyMetricAdapter());
 
   await Hive.openBox<Vial>('vials');
   await Hive.openBox<Schedule>('schedules');
@@ -24,6 +27,7 @@ void main() async {
   await Hive.openBox<bool>('settings');
   await DoseLogStore.instance.init();
   await VialInventoryStore.instance.init();
+  await BodyMetricStore.instance.init();
 
   runApp(const MyApp());
 }
