@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class SectionTile extends StatelessWidget {
   final String title;
@@ -19,10 +20,10 @@ class SectionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             colors: [
-              Color(0xFF1A1A1A),
-              Color(0xFF222222),
+              context.colors.card,
+              context.colors.border2,
             ],
           ),
           borderRadius: BorderRadius.circular(20),
@@ -43,7 +44,7 @@ class SectionTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: Colors.grey),
+                    style: TextStyle(color: context.colors.textSecondary),
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../models/compound.dart';
 
 class CompoundDetailScreen extends StatelessWidget {
@@ -89,7 +90,7 @@ class CompoundDetailScreen extends StatelessWidget {
     final details = _getDetails();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -108,16 +109,16 @@ class CompoundDetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Description card
-                          _descriptionCard(color),
+                          _descriptionCard(context, color),
 
                           const SizedBox(height: 20),
 
                           // Info tiles
-                          _sectionLabel("COMPOUND PROFILE"),
+                          _sectionLabel(context, "COMPOUND PROFILE"),
                           const SizedBox(height: 12),
                           ...details.entries
                               .where((e) => e.key != 'Notes')
-                              .map((e) => _infoTile(e.key, e.value, color)),
+                              .map((e) => _infoTile(context, e.key, e.value, color)),
 
                           const SizedBox(height: 20),
 
@@ -150,7 +151,7 @@ class CompoundDetailScreen extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             color.withOpacity(0.15),
-            const Color(0xFF0D0D0D),
+            context.colors.background,
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -223,14 +224,14 @@ class CompoundDetailScreen extends StatelessWidget {
   }
 
   // ===== DESCRIPTION CARD =====
-  Widget _descriptionCard(Color color) {
+  Widget _descriptionCard(BuildContext context, Color color) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: context.colors.cardAlt,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF222222)),
+        border: Border.all(color: context.colors.border2),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,8 +241,8 @@ class CompoundDetailScreen extends StatelessWidget {
           Expanded(
             child: Text(
               compound.description,
-              style: const TextStyle(
-                  fontSize: 14, height: 1.5, color: Colors.white70),
+              style: TextStyle(
+                  fontSize: 14, height: 1.5, color: context.colors.textSecondary),
             ),
           ),
         ],
@@ -250,7 +251,7 @@ class CompoundDetailScreen extends StatelessWidget {
   }
 
   // ===== SECTION LABEL =====
-  Widget _sectionLabel(String text) {
+  Widget _sectionLabel(BuildContext context, String text) {
     return Row(
       children: [
         Text(
@@ -266,9 +267,9 @@ class CompoundDetailScreen extends StatelessWidget {
         Expanded(
           child: Container(
             height: 1,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF2A2A2A), Colors.transparent],
+                colors: [context.colors.border, Colors.transparent],
               ),
             ),
           ),
@@ -278,14 +279,14 @@ class CompoundDetailScreen extends StatelessWidget {
   }
 
   // ===== INFO TILE =====
-  Widget _infoTile(String title, String value, Color color) {
+  Widget _infoTile(BuildContext context, String title, String value, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: context.colors.cardAlt,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF222222)),
+        border: Border.all(color: context.colors.border2),
       ),
       child: Row(
         children: [
@@ -300,7 +301,7 @@ class CompoundDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             title,
-            style: const TextStyle(color: Colors.grey, fontSize: 13),
+            style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
           ),
           const Spacer(),
           Text(
@@ -344,9 +345,9 @@ class CompoundDetailScreen extends StatelessWidget {
   Widget _addButton(BuildContext context, Color color) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      decoration: const BoxDecoration(
-        color: Color(0xFF0D0D0D),
-        border: Border(top: BorderSide(color: Color(0xFF1A1A1A))),
+      decoration: BoxDecoration(
+        color: context.colors.background,
+        border: Border(top: BorderSide(color: context.colors.card)),
       ),
       child: GestureDetector(
         onTap: () => Navigator.pop(context),

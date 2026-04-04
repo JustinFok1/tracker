@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../data/vial_store.dart';
 import '../data/schedule_store.dart';
 import '../models/schedule.dart';
@@ -41,7 +42,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     final isEdit = widget.existingSchedule != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -50,7 +51,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
+              color: context.colors.card,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.arrow_back, size: 18),
@@ -89,7 +90,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
                 isEdit
                     ? "Update your schedule"
                     : "Set up your dosing schedule",
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
               ),
             ),
 
@@ -139,15 +140,15 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: context.colors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Vial>(
-          dropdownColor: const Color(0xFF1A1A1A),
-          hint: const Text("Select a compound",
-              style: TextStyle(color: Colors.grey)),
+          dropdownColor: context.colors.card,
+          hint: Text("Select a compound",
+              style: TextStyle(color: context.colors.textSecondary)),
           value: selectedVial,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
@@ -210,12 +211,12 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
                 end: Alignment.bottomRight,
               )
                   : null,
-              color: selected ? null : const Color(0xFF1A1A1A),
+              color: selected ? null : context.colors.card,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: selected
                     ? Colors.transparent
-                    : const Color(0xFF2A2A2A),
+                    : context.colors.border,
               ),
             ),
             child: Center(

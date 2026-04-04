@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../data/mock_compounds.dart';
 import '../data/vial_store.dart';
 import '../models/compound.dart';
@@ -158,7 +159,7 @@ class _AddVialScreenState extends State<AddVialScreen> {
     final isEdit = widget.existingVial != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -167,7 +168,7 @@ class _AddVialScreenState extends State<AddVialScreen> {
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
+              color: context.colors.card,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.arrow_back, size: 18),
@@ -205,7 +206,7 @@ class _AddVialScreenState extends State<AddVialScreen> {
                 isEdit
                     ? "Update your compound details"
                     : "Add a new compound to your inventory",
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
               ),
             ),
 
@@ -411,7 +412,7 @@ class _AddVialScreenState extends State<AddVialScreen> {
           Icon(icon, color: color, size: 14),
           const SizedBox(width: 8),
           Text(label,
-              style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
           const Spacer(),
           Text(value,
               style: TextStyle(
@@ -427,9 +428,9 @@ class _AddVialScreenState extends State<AddVialScreen> {
       IconData icon, Color color, String label, String value) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.only(bottom: 10),
-          child: Divider(color: Color(0xFF2A2A2A), height: 1),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Divider(color: context.colors.border, height: 1),
         ),
         _resultRow(icon, color, label, value),
       ],
@@ -454,9 +455,9 @@ class _AddVialScreenState extends State<AddVialScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: context.colors.border),
       ),
       child: TextField(
         controller: controller,
@@ -466,11 +467,11 @@ class _AddVialScreenState extends State<AddVialScreen> {
         onChanged: (_) => setState(() {}),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.grey),
+          hintStyle: TextStyle(color: context.colors.textSecondary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
           suffixText: suffix,
-          suffixStyle: const TextStyle(color: Colors.grey),
+          suffixStyle: TextStyle(color: context.colors.textSecondary),
         ),
       ),
     );
@@ -484,13 +485,13 @@ class _AddVialScreenState extends State<AddVialScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: context.colors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: const Color(0xFF1A1A1A),
+          dropdownColor: context.colors.card,
           value: value,
           icon: const Icon(Icons.keyboard_arrow_down,
               color: Colors.grey, size: 18),
@@ -513,15 +514,15 @@ class _AddVialScreenState extends State<AddVialScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: context.colors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: const Color(0xFF1A1A1A),
-          hint: const Text("Select Compound",
-              style: TextStyle(color: Colors.grey)),
+          dropdownColor: context.colors.card,
+          hint: Text("Select Compound",
+              style: TextStyle(color: context.colors.textSecondary)),
           value: selectedCompound,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),

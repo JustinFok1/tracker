@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
 import '../models/schedule.dart';
@@ -51,8 +52,8 @@ class _DoseCardState extends State<DoseCard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+        gradient: LinearGradient(
+          colors: [context.colors.card, context.colors.card2],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -119,7 +120,7 @@ class _DoseCardState extends State<DoseCard> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: allDone ? Colors.greenAccent : Colors.white,
+                    color: allDone ? Colors.greenAccent : context.colors.textPrimary,
                   ),
                 ),
                 Text(
@@ -137,7 +138,7 @@ class _DoseCardState extends State<DoseCard> {
               child: LinearProgressIndicator(
                 value: total > 0 ? taken / total : 0,
                 minHeight: 4,
-                backgroundColor: const Color(0xFF2A2A2A),
+                backgroundColor: context.colors.progressBg,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   allDone ? Colors.greenAccent : Colors.purple,
                 ),
@@ -175,7 +176,7 @@ class _DoseCardState extends State<DoseCard> {
                               fontSize: 12,
                               color: isTaken
                                   ? Colors.grey
-                                  : Colors.white70,
+                                  : context.colors.textSecondary,
                               decoration: isTaken
                                   ? TextDecoration.lineThrough
                                   : TextDecoration.none,

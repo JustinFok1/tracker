@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../data/dose_log_store.dart';
 import '../data/schedule_store.dart';
@@ -58,7 +59,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final selectedSchedules = _getSchedulesForDay(_selectedDay);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -87,7 +88,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.arrow_back, size: 18),
@@ -108,9 +109,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: context.colors.inputDeep,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF222222)),
+        border: Border.all(color: context.colors.border2),
       ),
       child: TableCalendar(
         firstDay: DateTime.utc(2020),
@@ -137,9 +138,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           rightChevronIcon: Icon(Icons.chevron_right, color: Colors.grey, size: 20),
           headerPadding: EdgeInsets.symmetric(vertical: 12),
         ),
-        daysOfWeekStyle: const DaysOfWeekStyle(
-          weekdayStyle: TextStyle(color: Colors.grey, fontSize: 12),
-          weekendStyle: TextStyle(color: Colors.grey, fontSize: 12),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: TextStyle(color: context.colors.textSecondary, fontSize: 12),
+          weekendStyle: TextStyle(color: context.colors.textSecondary, fontSize: 12),
         ),
         calendarStyle: CalendarStyle(
           outsideDaysVisible: false,
@@ -154,12 +155,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: Colors.purple, width: 1.5),
           ),
-          selectedTextStyle: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
-          todayTextStyle: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
-          defaultTextStyle: const TextStyle(color: Colors.white70),
-          weekendTextStyle: const TextStyle(color: Colors.white70),
+          selectedTextStyle: TextStyle(
+              color: context.colors.textPrimary, fontWeight: FontWeight.bold),
+          todayTextStyle: TextStyle(
+              color: context.colors.textPrimary, fontWeight: FontWeight.bold),
+          defaultTextStyle: TextStyle(color: context.colors.textSecondary),
+          weekendTextStyle: TextStyle(color: context.colors.textSecondary),
           markerDecoration: const BoxDecoration(
             color: Colors.transparent,
           ),
@@ -253,15 +254,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(Icons.calendar_today,
                   color: Colors.grey, size: 22),
             ),
             const SizedBox(height: 12),
-            const Text("No doses scheduled",
-                style: TextStyle(color: Colors.grey)),
+            Text("No doses scheduled",
+                style: TextStyle(color: context.colors.textSecondary)),
           ],
         ),
       );
@@ -287,12 +288,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             decoration: BoxDecoration(
               color: taken
                   ? Colors.greenAccent.withOpacity(0.07)
-                  : const Color(0xFF1A1A1A),
+                  : context.colors.card,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: taken
                     ? Colors.greenAccent.withOpacity(0.3)
-                    : const Color(0xFF2A2A2A),
+                    : context.colors.border,
               ),
             ),
             child: Row(
@@ -325,7 +326,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: taken ? Colors.white60 : Colors.white,
+                          color: taken ? Colors.grey : context.colors.textPrimary,
                           decoration: taken
                               ? TextDecoration.lineThrough
                               : TextDecoration.none,
@@ -352,7 +353,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       colors: [Colors.greenAccent, Colors.teal],
                     )
                         : null,
-                    color: taken ? null : const Color(0xFF2A2A2A),
+                    color: taken ? null : context.colors.border,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

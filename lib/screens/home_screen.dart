@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../widgets/dose_card.dart';
 import '../widgets/section_tile.dart';
 import 'calender_screen.dart';
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               greeting,
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 2),
             const Text(
@@ -121,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 2),
             Text(
               dateStr,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
             ),
           ],
         ),
@@ -132,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) => const AddScheduleScreen()));
             }),
             const SizedBox(width: 10),
-            _headerIcon(Icons.calendar_today, Colors.white70, onTap: () {
+            _headerIcon(Icons.calendar_today, context.colors.textSecondary, onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const CalendarScreen()));
             }),
@@ -168,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: color, size: 18),
@@ -219,28 +220,28 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A1A1A), Color(0xFF222222)],
+        gradient: LinearGradient(
+          colors: [context.colors.card, context.colors.border2],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.calendar_today, color: Colors.purple, size: 14),
-              SizedBox(width: 6),
+              const Icon(Icons.calendar_today, color: Colors.purple, size: 14),
+              const SizedBox(width: 6),
               Text("NEXT DOSE",
-                  style: TextStyle(color: Colors.grey, fontSize: 11)),
+                  style: TextStyle(color: context.colors.textSecondary, fontSize: 11)),
             ],
           ),
           const SizedBox(height: 16),
           if (nextCompound == null) ...[
             const Icon(Icons.calendar_month, size: 32, color: Colors.purple),
             const SizedBox(height: 8),
-            const Text("No schedule",
-                style: TextStyle(color: Colors.grey, fontSize: 13)),
+            Text("No schedule",
+                style: TextStyle(color: context.colors.textSecondary, fontSize: 13)),
             const SizedBox(height: 10),
             GestureDetector(
               onTap: () => Navigator.push(context,
@@ -250,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: context.colors.border,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text("+ Add",
@@ -334,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -351,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 2),
             Text(label,
                 style:
-                const TextStyle(color: Colors.grey, fontSize: 10)),
+                TextStyle(color: context.colors.textSecondary, fontSize: 10)),
           ],
         ),
       ),
@@ -372,9 +373,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: Container(
             height: 1,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF2A2A2A), Colors.transparent],
+                colors: [context.colors.border, Colors.transparent],
               ),
             ),
           ),
@@ -396,8 +397,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+          gradient: LinearGradient(
+            colors: [context.colors.card, context.colors.card2],
           ),
           borderRadius: BorderRadius.circular(18),
         ),

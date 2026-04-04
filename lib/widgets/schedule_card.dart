@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class ScheduleCard extends StatelessWidget {
   const ScheduleCard({super.key});
@@ -9,16 +10,16 @@ class ScheduleCard extends StatelessWidget {
       height: 140,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
-        children: const [
-          Text("NEXT DOSE", style: TextStyle(color: Colors.grey)),
-          Spacer(),
-          Icon(Icons.calendar_today, color: Colors.purple),
-          SizedBox(height: 8),
-          Text("No schedule set"),
+        children: [
+          Text("NEXT DOSE", style: TextStyle(color: context.colors.textSecondary)),
+          const Spacer(),
+          const Icon(Icons.calendar_today, color: Colors.purple),
+          const SizedBox(height: 8),
+          const Text("No schedule set"),
         ],
       ),
     );

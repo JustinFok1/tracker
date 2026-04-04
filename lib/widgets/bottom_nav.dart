@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -21,9 +22,9 @@ class BottomNav extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: context.colors.navBg,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFF222222)),
+        border: Border.all(color: context.colors.border2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),

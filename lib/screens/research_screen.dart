@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../data/mock_compounds.dart';
 import '../models/compound.dart';
 import 'compound_detail_screen.dart';
@@ -35,11 +36,9 @@ class _ResearchScreenState extends State<ResearchScreen> {
     switch (category) {
       case 'Peptide':
         return Colors.tealAccent;
-      case 'Hormone':
+      case 'Injectable':
         return Colors.orangeAccent;
-      case 'Secretagogue':
-        return Colors.purpleAccent;
-      case 'Oral Steroid':
+      case 'Oral':
         return Colors.pinkAccent;
       case 'SARM':
         return Colors.blueAccent;
@@ -52,11 +51,9 @@ class _ResearchScreenState extends State<ResearchScreen> {
     switch (category) {
       case 'Peptide':
         return Icons.biotech;
-      case 'Hormone':
-        return Icons.bolt;
-      case 'Secretagogue':
-        return Icons.trending_up;
-      case 'Oral Steroid':
+      case 'Injectable':
+        return Icons.colorize_outlined;
+      case 'Oral':
         return Icons.medication;
       case 'SARM':
         return Icons.science;
@@ -68,7 +65,7 @@ class _ResearchScreenState extends State<ResearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,24 +97,24 @@ class _ResearchScreenState extends State<ResearchScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.arrow_back, size: 18),
             ),
           ),
           const SizedBox(width: 14),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Research Library",
                 style:
                 TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               Text(
                 "Browse compounds & peptides",
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
               ),
             ],
           ),
@@ -133,17 +130,17 @@ class _ResearchScreenState extends State<ResearchScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF2A2A2A)),
+          border: Border.all(color: context.colors.border),
         ),
         child: TextField(
           onChanged: (v) => setState(() => searchQuery = v),
-          style: const TextStyle(color: Colors.white, fontSize: 14),
-          decoration: const InputDecoration(
+          style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
+          decoration: InputDecoration(
             icon: Icon(Icons.search, color: Colors.grey, size: 18),
             hintText: "Search compounds...",
-            hintStyle: TextStyle(color: Colors.grey),
+            hintStyle: TextStyle(color: context.colors.textSecondary),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 14),
           ),
@@ -179,10 +176,10 @@ class _ResearchScreenState extends State<ResearchScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.2) : const Color(0xFF1A1A1A),
+          color: selected ? color.withOpacity(0.2) : context.colors.card,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? color.withOpacity(0.6) : const Color(0xFF2A2A2A),
+            color: selected ? color.withOpacity(0.6) : context.colors.border,
           ),
         ),
         child: Text(
@@ -224,15 +221,15 @@ class _ResearchScreenState extends State<ResearchScreen> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(Icons.search_off,
                   color: Colors.grey, size: 24),
             ),
             const SizedBox(height: 12),
-            const Text("No compounds found",
-                style: TextStyle(color: Colors.grey)),
+            Text("No compounds found",
+                style: TextStyle(color: context.colors.textSecondary)),
           ],
         ),
       );
@@ -258,9 +255,9 @@ class _ResearchScreenState extends State<ResearchScreen> {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF141414),
+              color: context.colors.cardAlt,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFF222222)),
+              border: Border.all(color: context.colors.border2),
             ),
             child: Row(
               children: [

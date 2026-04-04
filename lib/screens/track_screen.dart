@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../data/vial_store.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
@@ -42,7 +43,7 @@ class _TrackScreenState extends State<TrackScreen> {
     final schedules = ScheduleStore.instance.schedules;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -156,7 +157,7 @@ class _TrackScreenState extends State<TrackScreen> {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(icon, color: color, size: 18),
@@ -242,7 +243,7 @@ class _TrackScreenState extends State<TrackScreen> {
           const SizedBox(height: 6),
           Text(subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey, fontSize: 13)),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 13)),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: onPressed,
@@ -250,7 +251,7 @@ class _TrackScreenState extends State<TrackScreen> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(buttonText,
@@ -279,9 +280,9 @@ class _TrackScreenState extends State<TrackScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: _cardDecoration(),
-        child: const Text(
+        child: Text(
           "Add a schedule to start tracking stats",
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: context.colors.textSecondary),
           textAlign: TextAlign.center,
         ),
       );
@@ -342,8 +343,8 @@ class _TrackScreenState extends State<TrackScreen> {
               ),
               const SizedBox(height: 14),
               onCycle.isEmpty
-                  ? const Text("None",
-                  style: TextStyle(color: Colors.grey))
+                  ? Text("None",
+                  style: TextStyle(color: context.colors.textSecondary))
                   : Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -411,7 +412,7 @@ class _TrackScreenState extends State<TrackScreen> {
                   color: color)),
           Text(unit,
               style:
-              const TextStyle(color: Colors.grey, fontSize: 12)),
+              TextStyle(color: context.colors.textSecondary, fontSize: 12)),
         ],
       ),
     );
@@ -420,8 +421,8 @@ class _TrackScreenState extends State<TrackScreen> {
   // ===== CARD STYLE =====
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+      gradient: LinearGradient(
+        colors: [context.colors.card, context.colors.card2],
       ),
       borderRadius: BorderRadius.circular(18),
     );
@@ -446,7 +447,7 @@ class _TrackScreenState extends State<TrackScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Theme.of(context).cardColor,
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text("Delete Compound"),
@@ -454,8 +455,8 @@ class _TrackScreenState extends State<TrackScreen> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel",
-                  style: TextStyle(color: Colors.grey))),
+              child: Text("Cancel",
+                  style: TextStyle(color: context.colors.textSecondary))),
           TextButton(
             onPressed: () {
               VialStore.instance.removeVial(vial);
@@ -473,7 +474,7 @@ class _TrackScreenState extends State<TrackScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: Theme.of(context).cardColor,
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text("Delete Schedule"),
@@ -481,8 +482,8 @@ class _TrackScreenState extends State<TrackScreen> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel",
-                  style: TextStyle(color: Colors.grey))),
+              child: Text("Cancel",
+                  style: TextStyle(color: context.colors.textSecondary))),
           TextButton(
             onPressed: () {
               ScheduleStore.instance.removeSchedule(s);
@@ -540,9 +541,9 @@ class _ExpandableVialTile extends StatefulWidget {
 class _ExpandableVialTileState extends State<_ExpandableVialTile> {
   bool expanded = false;
 
-  BoxDecoration _cardDecoration() => BoxDecoration(
-    gradient: const LinearGradient(
-      colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+  BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
+    gradient: LinearGradient(
+      colors: [context.colors.card, context.colors.card2],
     ),
     borderRadius: BorderRadius.circular(18),
   );
@@ -557,7 +558,7 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: _cardDecoration(),
+            decoration: _cardDecoration(context),
             child: Row(
               children: [
                 Container(
@@ -580,7 +581,7 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
                 ),
                 Text(
                   "${widget.vials.length} compound${widget.vials.length != 1 ? 's' : ''}",
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(width: 8),
                 Icon(
@@ -655,9 +656,9 @@ class _ExpandableScheduleTile extends StatefulWidget {
 class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
   bool expanded = false;
 
-  BoxDecoration _cardDecoration() => BoxDecoration(
-    gradient: const LinearGradient(
-      colors: [Color(0xFF1A1A1A), Color(0xFF1E1E1E)],
+  BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
+    gradient: LinearGradient(
+      colors: [context.colors.card, context.colors.card2],
     ),
     borderRadius: BorderRadius.circular(18),
   );
@@ -672,7 +673,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: _cardDecoration(),
+            decoration: _cardDecoration(context),
             child: Row(
               children: [
                 Container(
@@ -695,7 +696,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
                 ),
                 Text(
                   "${widget.schedules.length} schedule${widget.schedules.length != 1 ? 's' : ''}",
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(width: 8),
                 Icon(
@@ -742,7 +743,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161616),
+                    color: context.colors.cardAlt,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                         color: Colors.pink.withOpacity(0.15)),
@@ -823,7 +824,7 @@ class _VialDosageRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10, left: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF161616),
+        color: context.colors.cardAlt,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.purple.withOpacity(0.15)),
       ),
