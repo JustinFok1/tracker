@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/dose_card.dart';
 import 'calender_screen.dart';
+import 'track_screen.dart';
 import 'history_screen.dart';
 import 'research_screen.dart';
 import 'add_schedule_screen.dart';
+import 'add_vial_screen.dart';
 import 'body_metrics_screen.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
@@ -53,10 +55,19 @@ class _HomeScreenState extends State<HomeScreen> {
               _sectionLabel("QUICK ACCESS"),
               const SizedBox(height: 12),
               _navTile(
+                icon: Icons.bar_chart_rounded,
+                iconColor: Colors.orangeAccent,
+                title: "Track",
+                subtitle: "Manage vials, inventory & schedules",
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const TrackScreen())),
+              ),
+              const SizedBox(height: 10),
+              _navTile(
                 icon: Icons.history,
                 iconColor: Colors.purpleAccent,
                 title: "Dose History",
-                subtitle: "View and edit your dosing history",
+                subtitle: "View your dosing history",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const HistoryScreen())),
               ),
@@ -68,16 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 subtitle: "Browse compounds & peptides",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const ResearchScreen())),
-              ),
-              const SizedBox(height: 10),
-              _navTile(
-                icon: Icons.calendar_month_outlined,
-                iconColor: Colors.pinkAccent,
-                title: "Schedule",
-                subtitle: "Manage your dosing schedule",
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(
-                        builder: (_) => const AddScheduleScreen())),
               ),
               const SizedBox(height: 10),
               _navTile(
@@ -141,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _headerIcon(Icons.flash_on, Colors.purple, onTap: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const AddScheduleScreen()));
+                  MaterialPageRoute(builder: (_) => const AddVialScreen()));
             }),
             const SizedBox(width: 10),
             _headerIcon(Icons.calendar_today, context.colors.textSecondary, onTap: () {

@@ -10,7 +10,7 @@ import '../data/data_service.dart';
 import '../services/auth_service.dart';
 import '../models/body_metric.dart';
 import 'home_screen.dart';
-import 'track_screen.dart';
+import 'calender_screen.dart';
 import 'history_screen.dart';
 import 'body_metrics_screen.dart';
 import '../widgets/bottom_nav.dart';
@@ -921,7 +921,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
-      const TrackScreen(),
+      const CalendarScreen(),
       const HistoryScreen(),
       const _ProfileScreen(),
     ];
