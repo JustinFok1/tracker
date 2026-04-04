@@ -7,6 +7,7 @@ import 'history_screen.dart';
 import 'research_screen.dart';
 import 'add_schedule_screen.dart';
 import 'add_vial_screen.dart';
+import 'reconstitution_calculator_screen.dart';
 import 'body_metrics_screen.dart';
 import '../data/schedule_store.dart';
 import '../data/dose_log_store.dart';
@@ -48,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _header(),
               const SizedBox(height: 24),
+              _streakBanner(),
               _topCards(context),
               const SizedBox(height: 20),
               _statsStrip(),
@@ -74,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
               _navTile(
                 icon: Icons.science_outlined,
-                iconColor: Colors.tealAccent,
+                iconColor: Colors.deepPurpleAccent,
                 title: "Research Library",
                 subtitle: "Browse compounds & peptides",
                 onTap: () => Navigator.push(context,
@@ -89,6 +91,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(
                         builder: (_) => const BodyMetricsScreen())),
+              ),
+              const SizedBox(height: 10),
+              _navTile(
+                icon: Icons.calculate_outlined,
+                iconColor: Colors.blueAccent,
+                title: "Reconstitution Calculator",
+                subtitle: "Calculate concentration & syringe units",
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (_) => const ReconstitutionCalculatorScreen())),
               ),
               const SizedBox(height: 24),
             ],
@@ -311,6 +323,70 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.purple, fontSize: 12)),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  // ===== STREAK BANNER =====
+  Widget _streakBanner() {
+    final schedules = ScheduleStore.instance.schedules;
+    final compoundKeys = schedules
+        .map((s) => "${s.compoundName}_${s.dosage}_${s.unit}")
+        .toSet()
+        .toList();
+    final streak = DoseLogStore.instance.currentStreak(compoundKeys);
+
+    if (streak < 2) return const SizedBox.shrink();
+
+    String message;
+    if (streak >= 30) {
+      message = 'Incredible dedication.';
+    } else if (streak >= 14) {
+      message = 'Two weeks strong. Keep going.';
+    } else if (streak >= 7) {
+      message = 'One week streak. Crushing it.';
+    } else {
+      message = 'Keep the streak alive.';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: streak >= 7
+              ? [const Color(0xFFFF6B00), const Color(0xFFFF9500)]
+              : [const Color(0xFF7B2FBE), const Color(0xFFE91E8C)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          const Text('🔥', style: TextStyle(fontSize: 28)),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$streak day streak',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
