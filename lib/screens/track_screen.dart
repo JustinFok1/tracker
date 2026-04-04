@@ -196,10 +196,10 @@ class _TrackScreenState extends State<TrackScreen> {
               padding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.15),
+                color: Colors.purple.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
                 border:
-                Border.all(color: Colors.purple.withOpacity(0.3)),
+                Border.all(color: Colors.purple.withValues(alpha: 0.3)),
               ),
               child: Text(
                 action,
@@ -231,7 +231,7 @@ class _TrackScreenState extends State<TrackScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: iconColor, size: 22),
@@ -327,7 +327,7 @@ class _TrackScreenState extends State<TrackScreen> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: Colors.tealAccent.withOpacity(0.12),
+                      color: Colors.tealAccent.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.science,
@@ -353,10 +353,10 @@ class _TrackScreenState extends State<TrackScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.15),
+                      color: Colors.purple.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: Colors.purple.withOpacity(0.4)),
+                          color: Colors.purple.withValues(alpha: 0.4)),
                     ),
                     child: Text(name,
                         style: const TextStyle(
@@ -391,7 +391,7 @@ class _TrackScreenState extends State<TrackScreen> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 15),
@@ -565,7 +565,7 @@ class _ExpandableVialTileState extends State<_ExpandableVialTile> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.purpleAccent.withOpacity(0.12),
+                    color: Colors.purpleAccent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.opacity,
@@ -680,7 +680,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.pinkAccent.withOpacity(0.12),
+                    color: Colors.pinkAccent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.calendar_month,
@@ -746,7 +746,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
                     color: context.colors.cardAlt,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                        color: Colors.pink.withOpacity(0.15)),
+                        color: Colors.pink.withValues(alpha: 0.15)),
                   ),
                   child: Row(
                     children: [
@@ -760,7 +760,7 @@ class _ExpandableScheduleTileState extends State<_ExpandableScheduleTile> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.pink.withOpacity(0.1),
+                          color: Colors.pink.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -826,7 +826,7 @@ class _VialDosageRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.cardAlt,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.purple.withOpacity(0.15)),
+        border: Border.all(color: Colors.purple.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
@@ -838,7 +838,7 @@ class _VialDosageRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: stockColor.withOpacity(0.12),
+                color: stockColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(

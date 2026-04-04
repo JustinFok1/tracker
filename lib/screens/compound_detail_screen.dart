@@ -150,7 +150,7 @@ class CompoundDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            color.withOpacity(0.15),
+            color.withValues(alpha: 0.15),
             context.colors.background,
           ],
           begin: Alignment.topCenter,
@@ -179,9 +179,9 @@ class CompoundDetailScreen extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.3)),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
                 ),
                 child: Icon(icon, color: color, size: 26),
               ),
@@ -202,7 +202,7 @@ class CompoundDetailScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -320,9 +320,9 @@ class CompoundDetailScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.07),
+        color: color.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +333,7 @@ class CompoundDetailScreen extends StatelessWidget {
             child: Text(
               notes,
               style: TextStyle(
-                  fontSize: 13, height: 1.5, color: color.withOpacity(0.9)),
+                  fontSize: 13, height: 1.5, color: color.withValues(alpha: 0.9)),
             ),
           ),
         ],
@@ -356,7 +356,7 @@ class CompoundDetailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color.withOpacity(0.8), color],
+              colors: [color.withValues(alpha: 0.8), color],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

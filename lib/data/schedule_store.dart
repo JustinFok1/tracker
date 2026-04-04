@@ -27,4 +27,6 @@ class ScheduleStore extends ChangeNotifier {
     _box.put(key, newSchedule);
     notifyListeners();
   }
+
+  void refresh() => notifyListeners();
 }

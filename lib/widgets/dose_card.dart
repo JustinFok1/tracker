@@ -52,9 +52,10 @@ class _DoseCardState extends State<DoseCard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.colors.card, context.colors.card2],
-        ),
+        color: context.isDark ? null : context.colors.card,
+        gradient: context.isDark
+            ? LinearGradient(colors: [context.colors.card, context.colors.card2])
+            : null,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -68,8 +69,8 @@ class _DoseCardState extends State<DoseCard> {
                 height: 28,
                 decoration: BoxDecoration(
                   color: allDone
-                      ? Colors.greenAccent.withOpacity(0.12)
-                      : Colors.purple.withOpacity(0.12),
+                      ? Colors.greenAccent.withValues(alpha: 0.12)
+                      : Colors.purple.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

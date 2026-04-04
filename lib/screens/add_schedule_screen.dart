@@ -27,12 +27,14 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     if (widget.existingSchedule != null) {
       selectedDays = List.from(widget.existingSchedule!.daysOfWeek);
       final vials = VialStore.instance.vials;
-      selectedVial = vials.firstWhere(
-            (v) =>
-        v.compoundName == widget.existingSchedule!.compoundName &&
+      final matches = vials.where(
+        (v) =>
+            v.compoundName == widget.existingSchedule!.compoundName &&
             v.dosage == widget.existingSchedule!.dosage,
-        orElse: () => vials.isNotEmpty ? vials.first : null as Vial,
-      );
+      ).toList();
+      selectedVial = matches.isNotEmpty
+          ? matches.first
+          : (vials.isNotEmpty ? vials.first : null);
     }
   }
 
@@ -242,9 +244,9 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.purple.withOpacity(0.1),
+        color: Colors.purple.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purple.withOpacity(0.3)),
+        border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

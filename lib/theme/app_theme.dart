@@ -6,7 +6,7 @@ class AppTheme {
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.dark.background,
     cardColor: AppColors.dark.card,
-    dialogBackgroundColor: AppColors.dark.card,
+    dialogTheme: DialogThemeData(backgroundColor: AppColors.dark.card),
     primaryColor: const Color(0xFFB388FF),
     fontFamily: 'SF Pro',
     extensions: const [AppColors.dark],
@@ -16,9 +16,14 @@ class AppTheme {
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.light.background,
     cardColor: AppColors.light.card,
-    dialogBackgroundColor: AppColors.light.card,
+    dialogTheme: DialogThemeData(backgroundColor: AppColors.light.card),
     primaryColor: const Color(0xFFB388FF),
     fontFamily: 'SF Pro',
     extensions: const [AppColors.light],
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shadowColor: const Color(0x18000000),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
   );
 }

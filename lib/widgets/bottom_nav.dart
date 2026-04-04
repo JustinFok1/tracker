@@ -27,7 +27,7 @@ class BottomNav extends StatelessWidget {
         border: Border.all(color: context.colors.border2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -47,7 +47,7 @@ class BottomNav extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
                 color: selected
-                    ? Colors.purple.withOpacity(0.15)
+                    ? Colors.purple.withValues(alpha: 0.15)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),

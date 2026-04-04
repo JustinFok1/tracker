@@ -151,7 +151,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.3),
+            color: Colors.purple.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(color: Colors.purple, width: 1.5),
           ),
@@ -224,8 +224,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: taken == schedules.length
-                    ? Colors.greenAccent.withOpacity(0.15)
-                    : Colors.purple.withOpacity(0.15),
+                    ? Colors.greenAccent.withValues(alpha: 0.15)
+                    : Colors.purple.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -287,12 +287,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: taken
-                  ? Colors.greenAccent.withOpacity(0.07)
+                  ? Colors.greenAccent.withValues(alpha: 0.07)
                   : context.colors.card,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: taken
-                    ? Colors.greenAccent.withOpacity(0.3)
+                    ? Colors.greenAccent.withValues(alpha: 0.3)
                     : context.colors.border,
               ),
             ),
@@ -304,8 +304,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   height: 36,
                   decoration: BoxDecoration(
                     color: taken
-                        ? Colors.greenAccent.withOpacity(0.12)
-                        : Colors.purple.withOpacity(0.12),
+                        ? Colors.greenAccent.withValues(alpha: 0.12)
+                        : Colors.purple.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/dose_card.dart';
-import '../widgets/section_tile.dart';
 import 'calender_screen.dart';
 import 'research_screen.dart';
 import 'add_schedule_screen.dart';
@@ -127,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 2),
             const Text(
-              "Track Lab",
+              "DoseIQ",
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 2),
@@ -231,9 +230,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.colors.card, context.colors.border2],
-        ),
+        color: context.isDark ? null : context.colors.card,
+        gradient: context.isDark
+            ? LinearGradient(colors: [context.colors.card, context.colors.border2])
+            : null,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -274,8 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: isToday
-                    ? Colors.orange.withOpacity(0.15)
-                    : Colors.purple.withOpacity(0.15),
+                    ? Colors.orange.withValues(alpha: 0.15)
+                    : Colors.purple.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -290,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              nextCompound!,
+              nextCompound,
               style: const TextStyle(
                   fontSize: 15, fontWeight: FontWeight.bold),
               maxLines: 2,
@@ -301,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding:
               const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.2),
+                color: Colors.purple.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(nextDose!,
@@ -329,13 +329,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Row(
       children: [
-        _miniStat("${dosesThisWeek}", "This Week", Icons.check_circle_outline,
+        _miniStat("$dosesThisWeek", "This Week", Icons.check_circle_outline,
             Colors.purple),
         const SizedBox(width: 10),
         _miniStat("${streak}d", "Streak", Icons.local_fire_department,
             streak >= 7 ? Colors.orange : Colors.purple),
         const SizedBox(width: 10),
-        _miniStat("${onCycle}", "On Cycle", Icons.science, Colors.tealAccent),
+        _miniStat("$onCycle", "On Cycle", Icons.science, Colors.tealAccent),
       ],
     );
   }
@@ -408,9 +408,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [context.colors.card, context.colors.card2],
-          ),
+          color: context.isDark ? null : context.colors.card,
+          gradient: context.isDark
+              ? LinearGradient(colors: [context.colors.card, context.colors.card2])
+              : null,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
@@ -419,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 20),

@@ -47,6 +47,8 @@ class DoseLogStore extends ChangeNotifier {
     return count;
   }
 
+  void refresh() => notifyListeners();
+
   int currentStreak(List<String> compoundKeys) {
     if (compoundKeys.isEmpty) return 0;
 

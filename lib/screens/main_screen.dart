@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import '../theme/app_colors.dart';
 import '../data/theme_store.dart';
 import '../data/body_metric_store.dart';
+import '../data/data_service.dart';
 import '../models/body_metric.dart';
 import 'home_screen.dart';
 import 'track_screen.dart';
@@ -39,6 +40,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _refresh() => setState(() {});
+
+  bool _showAllMetrics = false;
 
   List<BodyMetric> get _metrics => BodyMetricStore.instance.metrics;
   BodyMetric? get _latest => _metrics.isNotEmpty ? _metrics.first : null;
@@ -216,8 +219,69 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               const SizedBox(height: 20),
               _sectionLabel("HISTORY"),
               const SizedBox(height: 12),
-              ..._metrics.map((m) => _metricCard(m)),
+              ...(_showAllMetrics ? _metrics : _metrics.take(3))
+                  .map((m) => _metricCard(m)),
+              if (_metrics.length > 3)
+                GestureDetector(
+                  onTap: () => setState(() => _showAllMetrics = !_showAllMetrics),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: context.colors.card,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: context.colors.border),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _showAllMetrics
+                            ? "Show less"
+                            : "Show all (${_metrics.length})",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: context.colors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
+
+            const SizedBox(height: 20),
+            _sectionLabel("DATA"),
+            const SizedBox(height: 12),
+            _settingsTile(
+              icon: Icons.table_chart_outlined,
+              iconColor: Colors.tealAccent,
+              title: "Export Body Metrics",
+              subtitle: "Save as CSV",
+              onTap: () => DataService.exportBodyMetrics(context),
+            ),
+            const SizedBox(height: 10),
+            _settingsTile(
+              icon: Icons.history,
+              iconColor: Colors.purpleAccent,
+              title: "Export Dose History",
+              subtitle: "Save as CSV",
+              onTap: () => DataService.exportDoseHistory(context),
+            ),
+            const SizedBox(height: 10),
+            _settingsTile(
+              icon: Icons.cloud_upload_outlined,
+              iconColor: Colors.blueAccent,
+              title: "Backup All Data",
+              subtitle: "Export full backup as JSON",
+              onTap: () => DataService.backupAll(context),
+            ),
+            const SizedBox(height: 10),
+            _settingsTile(
+              icon: Icons.cloud_download_outlined,
+              iconColor: Colors.orangeAccent,
+              title: "Restore from Backup",
+              subtitle: "Import a JSON backup file",
+              onTap: () => DataService.restoreFromBackup(context),
+            ),
 
             const SizedBox(height: 20),
             _sectionLabel("SETTINGS"),
@@ -296,6 +360,55 @@ class _ProfileScreenState extends State<_ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _settingsTile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: context.colors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.colors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 18),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: TextStyle(
+                          color: context.colors.textSecondary, fontSize: 12)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right,
+                color: context.colors.textSecondary, size: 18),
+          ],
+        ),
+      ),
     );
   }
 

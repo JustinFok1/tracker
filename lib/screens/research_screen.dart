@@ -176,10 +176,10 @@ class _ResearchScreenState extends State<ResearchScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.2) : context.colors.card,
+          color: selected ? color.withValues(alpha: 0.2) : context.colors.card,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? color.withOpacity(0.6) : context.colors.border,
+            color: selected ? color.withValues(alpha: 0.6) : context.colors.border,
           ),
         ),
         child: Text(
@@ -266,7 +266,7 @@ class _ResearchScreenState extends State<ResearchScreen> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: Icon(icon, color: color, size: 20),
@@ -292,7 +292,7 @@ class _ResearchScreenState extends State<ResearchScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.12),
+                              color: color.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
