@@ -18,6 +18,7 @@ import 'data/body_metric_store.dart';
 import 'data/vial_inventory_store.dart';
 import 'data/theme_store.dart';
 import 'data/custom_compound_store.dart';
+import 'services/notification_service.dart';
 
 // Hive adapters must still be registered (generated code references them).
 import 'models/vial.dart';
@@ -33,6 +34,9 @@ void main() async {
   Hive.registerAdapter(ScheduleAdapter());
   Hive.registerAdapter(BodyMetricAdapter());
   await Hive.openBox<bool>('settings');
+
+  // Notifications — fire and forget so it never blocks startup
+  NotificationService.instance.init();
 
   // Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

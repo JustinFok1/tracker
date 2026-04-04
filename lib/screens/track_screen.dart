@@ -124,9 +124,26 @@ class _TrackScreenState extends State<TrackScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          "Track",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: context.colors.card,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.arrow_back, size: 18),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              "Track",
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
         Row(
           children: [

@@ -17,6 +17,7 @@ class AddScheduleScreen extends StatefulWidget {
 class _AddScheduleScreenState extends State<AddScheduleScreen> {
   Vial? selectedVial;
   List<int> selectedDays = [];
+  TimeOfDay? _reminderTime;
 
   final List<String> dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
   final List<String> dayFull = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -25,16 +26,21 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   void initState() {
     super.initState();
     if (widget.existingSchedule != null) {
-      selectedDays = List.from(widget.existingSchedule!.daysOfWeek);
+      final s = widget.existingSchedule!;
+      selectedDays = List.from(s.daysOfWeek);
       final vials = VialStore.instance.vials;
       final matches = vials.where(
-        (v) =>
-            v.compoundName == widget.existingSchedule!.compoundName &&
-            v.dosage == widget.existingSchedule!.dosage,
+        (v) => v.compoundName == s.compoundName && v.dosage == s.dosage,
       ).toList();
       selectedVial = matches.isNotEmpty
           ? matches.first
           : (vials.isNotEmpty ? vials.first : null);
+      if (s.reminderMinutes != null) {
+        _reminderTime = TimeOfDay(
+          hour: s.reminderMinutes! ~/ 60,
+          minute: s.reminderMinutes! % 60,
+        );
+      }
     }
   }
 
@@ -115,6 +121,13 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
               const SizedBox(height: 12),
               _daysSummary(),
             ],
+
+            const SizedBox(height: 24),
+
+            // Reminder time
+            _fieldLabel("Reminder Time (optional)"),
+            const SizedBox(height: 8),
+            _timePicker(),
 
             const SizedBox(height: 36),
 
@@ -264,6 +277,58 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     );
   }
 
+  Widget _timePicker() {
+    final label = _reminderTime == null
+        ? 'No reminder set'
+        : _reminderTime!.format(context);
+
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: _reminderTime ?? TimeOfDay.now(),
+        );
+        if (picked != null) setState(() => _reminderTime = picked);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: context.colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: context.colors.border),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.notifications_outlined,
+              size: 18,
+              color: _reminderTime != null
+                  ? Colors.purpleAccent
+                  : context.colors.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _reminderTime != null
+                      ? context.colors.textPrimary
+                      : context.colors.textSecondary,
+                ),
+              ),
+            ),
+            if (_reminderTime != null)
+              GestureDetector(
+                onTap: () => setState(() => _reminderTime = null),
+                child: const Icon(Icons.close, size: 16, color: Colors.grey),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _saveButton(bool isEdit) {
     return GestureDetector(
       onTap: _saveSchedule,
@@ -295,13 +360,19 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
     if (selectedVial == null || selectedDays.isEmpty) return;
 
     final vial = selectedVial!;
+    final reminderMinutes = _reminderTime != null
+        ? _reminderTime!.hour * 60 + _reminderTime!.minute
+        : null;
+
     final schedule = Schedule(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.existingSchedule?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       compoundName: vial.compoundName,
       dosage: vial.dosage,
       unit: vial.unit,
       daysOfWeek: selectedDays,
-      startDate: DateTime.now(),
+      startDate: widget.existingSchedule?.startDate ?? DateTime.now(),
+      reminderMinutes: reminderMinutes,
     );
 
     if (widget.existingSchedule != null) {

@@ -22,6 +22,9 @@ class Schedule extends HiveObject {
   @HiveField(5)
   final DateTime startDate;
 
+  // Minutes since midnight (e.g. 480 = 8:00 AM). Null means no reminder.
+  final int? reminderMinutes;
+
   Schedule({
     required this.id,
     required this.compoundName,
@@ -29,5 +32,6 @@ class Schedule extends HiveObject {
     required this.unit,
     required this.daysOfWeek,
     required this.startDate,
+    this.reminderMinutes,
   });
 }

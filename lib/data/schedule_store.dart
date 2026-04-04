@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/schedule.dart';
+import '../services/notification_service.dart';
 
 class ScheduleStore extends ChangeNotifier {
   static final ScheduleStore instance = ScheduleStore._internal();
@@ -31,6 +32,7 @@ class ScheduleStore extends ChangeNotifier {
       unit: d['unit'] as String,
       daysOfWeek: (d['daysOfWeek'] as List).cast<int>(),
       startDate: (d['startDate'] as Timestamp).toDate(),
+      reminderMinutes: d['reminderMinutes'] as int?,
     );
   }
 
@@ -41,15 +43,23 @@ class ScheduleStore extends ChangeNotifier {
     'unit': s.unit,
     'daysOfWeek': s.daysOfWeek,
     'startDate': Timestamp.fromDate(s.startDate),
+    if (s.reminderMinutes != null) 'reminderMinutes': s.reminderMinutes,
   };
 
-  void addSchedule(Schedule schedule) =>
-      _col.doc(schedule.id).set(_toMap(schedule));
+  void addSchedule(Schedule schedule) {
+    _col.doc(schedule.id).set(_toMap(schedule));
+    NotificationService.instance.scheduleForSchedule(schedule);
+  }
 
-  void removeSchedule(Schedule schedule) => _col.doc(schedule.id).delete();
+  void removeSchedule(Schedule schedule) {
+    _col.doc(schedule.id).delete();
+    NotificationService.instance.cancelForSchedule(schedule.id);
+  }
 
-  void updateSchedule(Schedule oldSchedule, Schedule newSchedule) =>
-      _col.doc(oldSchedule.id).set(_toMap(newSchedule));
+  void updateSchedule(Schedule oldSchedule, Schedule newSchedule) {
+    _col.doc(oldSchedule.id).set(_toMap(newSchedule));
+    NotificationService.instance.scheduleForSchedule(newSchedule);
+  }
 
   void refresh() => notifyListeners();
 
