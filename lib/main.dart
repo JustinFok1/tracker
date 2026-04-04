@@ -17,6 +17,7 @@ import 'data/dose_log_store.dart';
 import 'data/body_metric_store.dart';
 import 'data/vial_inventory_store.dart';
 import 'data/theme_store.dart';
+import 'data/custom_compound_store.dart';
 
 // Hive adapters must still be registered (generated code references them).
 import 'models/vial.dart';
@@ -83,6 +84,7 @@ class _MyAppState extends State<MyApp> {
       DoseLogStore.instance.init(user.uid),
       BodyMetricStore.instance.init(user.uid),
       VialInventoryStore.instance.init(user.uid),
+      CustomCompoundStore.instance.init(user.uid),
     ]);
     if (mounted) setState(() => _ready = true);
   }

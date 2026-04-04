@@ -1,12 +1,54 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../data/custom_compound_store.dart';
 import '../models/compound.dart';
 import 'add_vial_screen.dart';
+import 'research_screen.dart';
 
-class CompoundDetailScreen extends StatelessWidget {
+class CompoundDetailScreen extends StatefulWidget {
   final Compound compound;
 
   const CompoundDetailScreen({super.key, required this.compound});
+
+  @override
+  State<CompoundDetailScreen> createState() => _CompoundDetailScreenState();
+}
+
+class _CompoundDetailScreenState extends State<CompoundDetailScreen> {
+  late Compound compound;
+
+  @override
+  void initState() {
+    super.initState();
+    compound = widget.compound;
+    CustomCompoundStore.instance.addListener(_onStoreUpdate);
+  }
+
+  @override
+  void dispose() {
+    CustomCompoundStore.instance.removeListener(_onStoreUpdate);
+    super.dispose();
+  }
+
+  void _onStoreUpdate() {
+    if (!compound.isCustom) return;
+    // Find the updated version of this compound in the store
+    final updated = CustomCompoundStore.instance.compounds
+        .where((c) => c.id == compound.id)
+        .firstOrNull;
+    if (updated != null) {
+      setState(() => compound = updated);
+    }
+  }
+
+  void _openEdit() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => CompoundFormSheet(existing: compound),
+    );
+  }
 
   Color _categoryColor(String category) {
     switch (category) {
@@ -674,11 +716,22 @@ class CompoundDetailScreen extends StatelessWidget {
     }
   }
 
+  Map<String, String> _getCustomDetails() {
+    final c = compound;
+    return {
+      if (c.dosage != null) 'Dosage': c.dosage!,
+      if (c.halfLife != null) 'Half-life': c.halfLife!,
+      if (c.frequency != null) 'Frequency': c.frequency!,
+      if (c.route != null) 'Route': c.route!,
+      if (c.profileNotes != null) 'Notes': c.profileNotes!,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = _categoryColor(compound.category);
     final icon = _categoryIcon(compound.category);
-    final details = _getDetails();
+    final details = compound.isCustom ? _getCustomDetails() : _getDetails();
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -705,13 +758,14 @@ class CompoundDetailScreen extends StatelessWidget {
                           const SizedBox(height: 20),
 
                           // Info tiles
-                          _sectionLabel(context, "COMPOUND PROFILE"),
-                          const SizedBox(height: 12),
-                          ...details.entries
-                              .where((e) => e.key != 'Notes')
-                              .map((e) => _infoTile(context, e.key, e.value, color)),
-
-                          const SizedBox(height: 20),
+                          if (details.isNotEmpty) ...[
+                            _sectionLabel(context, "COMPOUND PROFILE"),
+                            const SizedBox(height: 12),
+                            ...details.entries
+                                .where((e) => e.key != 'Notes')
+                                .map((e) => _infoTile(context, e.key, e.value, color)),
+                            const SizedBox(height: 20),
+                          ],
 
                           // Notes card
                           if (details.containsKey('Notes'))
@@ -751,17 +805,35 @@ class CompoundDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: BorderRadius.circular(12),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.arrow_back, size: 18),
+                ),
               ),
-              child: const Icon(Icons.arrow_back, size: 18),
-            ),
+              const Spacer(),
+              if (compound.isCustom)
+                GestureDetector(
+                  onTap: _openEdit,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.edit_outlined, size: 18),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 20),
           Row(

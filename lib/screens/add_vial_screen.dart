@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../data/mock_compounds.dart';
+import '../data/custom_compound_store.dart';
 import '../data/vial_store.dart';
 import '../models/compound.dart';
 import '../models/vial.dart';
@@ -62,7 +63,8 @@ class _AddVialScreenState extends State<AddVialScreen> {
   // ===== CATEGORY HELPERS =====
   String get _category {
     if (selectedCompound == null) return '';
-    return allCompounds
+    final all = [...allCompounds, ...CustomCompoundStore.instance.compounds];
+    return all
         .firstWhere(
           (c) => c.name == selectedCompound,
           orElse: () => Compound(name: '', category: '', description: ''),
@@ -625,10 +627,30 @@ class _CompoundPickerSheetState extends State<_CompoundPickerSheet> {
   final _controller = TextEditingController();
   String _query = '';
 
+  @override
+  void initState() {
+    super.initState();
+    CustomCompoundStore.instance.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    CustomCompoundStore.instance.removeListener(_refresh);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _refresh() => setState(() {});
+
+  List<Compound> get _allCompounds => [
+        ...allCompounds,
+        ...CustomCompoundStore.instance.compounds,
+      ];
+
   List<Compound> get _filtered {
-    if (_query.isEmpty) return allCompounds;
+    if (_query.isEmpty) return _allCompounds;
     final q = _query.toLowerCase();
-    return allCompounds.where((c) =>
+    return _allCompounds.where((c) =>
       c.name.toLowerCase().contains(q) ||
       (c.genericName?.toLowerCase().contains(q) ?? false) ||
       c.category.toLowerCase().contains(q),
@@ -642,12 +664,6 @@ class _CompoundPickerSheetState extends State<_CompoundPickerSheet> {
       case 'Oral':       return Colors.pinkAccent;
       default:           return Colors.purple;
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -808,9 +824,240 @@ class _CompoundPickerSheetState extends State<_CompoundPickerSheet> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          // Create new compound button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+            child: GestureDetector(
+              onTap: () => _showCreateCompound(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: Colors.purple.withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, color: Colors.purpleAccent, size: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      'Create custom compound',
+                      style: TextStyle(
+                          color: Colors.purpleAccent,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+
+  void _showCreateCompound(BuildContext context) {
+    Navigator.pop(context); // close picker
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _InlineCompoundForm(
+        onCreated: (name) {
+          widget.onSelected(name);
+        },
+      ),
+    );
+  }
+}
+
+// ===== INLINE CREATE COMPOUND FORM =====
+class _InlineCompoundForm extends StatefulWidget {
+  final ValueChanged<String> onCreated;
+  const _InlineCompoundForm({required this.onCreated});
+
+  @override
+  State<_InlineCompoundForm> createState() => _InlineCompoundFormState();
+}
+
+class _InlineCompoundFormState extends State<_InlineCompoundForm> {
+  final _nameCtrl = TextEditingController();
+  final _genericCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  String _category = 'Peptide';
+  bool _saving = false;
+
+  static const _categories = ['Peptide', 'Injectable', 'Oral'];
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _genericCtrl.dispose();
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _nameCtrl.text.trim();
+    if (name.isEmpty) return;
+    setState(() => _saving = true);
+    try {
+      final compound = Compound(
+        name: name,
+        category: _category,
+        description: _descCtrl.text.trim(),
+        genericName: _genericCtrl.text.trim().isEmpty
+            ? null
+            : _genericCtrl.text.trim(),
+        isCustom: true,
+      );
+      await CustomCompoundStore.instance.add(compound);
+      widget.onCreated(name);
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        decoration: BoxDecoration(
+          color: context.colors.background,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 36, height: 4,
+                decoration: BoxDecoration(
+                  color: context.colors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('New Custom Compound',
+                style:
+                    TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            _label('NAME'),
+            const SizedBox(height: 6),
+            _field(_nameCtrl, 'e.g. BPC-157'),
+            const SizedBox(height: 14),
+            _label('CATEGORY'),
+            const SizedBox(height: 6),
+            _categoryRow(),
+            const SizedBox(height: 14),
+            _label('GENERIC NAME (optional)'),
+            const SizedBox(height: 6),
+            _field(_genericCtrl, 'e.g. Body Protection Compound'),
+            const SizedBox(height: 14),
+            _label('DESCRIPTION (optional)'),
+            const SizedBox(height: 6),
+            _field(_descCtrl, 'e.g. Healing peptide for recovery'),
+            const SizedBox(height: 24),
+            GestureDetector(
+              onTap: _saving ? null : _save,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF7B2FBE), Color(0xFFE91E8C)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: _saving
+                      ? const SizedBox(
+                          width: 18, height: 18,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Text('Add Compound',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _label(String t) => Text(t,
+      style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2));
+
+  Widget _field(TextEditingController ctrl, String hint) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: context.colors.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.colors.border),
+        ),
+        child: TextField(
+          controller: ctrl,
+          style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: context.colors.textSecondary),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 13),
+          ),
+        ),
+      );
+
+  Widget _categoryRow() => Row(
+        children: _categories.map((cat) {
+          final sel = _category == cat;
+          return GestureDetector(
+            onTap: () => setState(() => _category = cat),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.only(right: 8),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: sel
+                    ? Colors.purple.withValues(alpha: 0.2)
+                    : context.colors.card,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: sel
+                      ? Colors.purple.withValues(alpha: 0.6)
+                      : context.colors.border,
+                ),
+              ),
+              child: Text(cat,
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: sel ? Colors.purpleAccent : Colors.grey)),
+            ),
+          );
+        }).toList(),
+      );
 }
