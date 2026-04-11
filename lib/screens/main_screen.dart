@@ -132,6 +132,79 @@ class _ProfileScreenState extends State<_ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
+            // Anonymous upgrade banner
+            if (AuthService.isAnonymous) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.cloud_off_rounded, color: Colors.orange, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Local mode — data not backed up",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "Sign in with Google to sync & secure your data.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        try {
+                          await AuthService.signInWithGoogle();
+                        } catch (_) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Sign-in failed. Please try again.")),
+                            );
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          "Sign in",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             // Weight stat card
             _sectionLabel("BODY METRICS"),
             const SizedBox(height: 12),
@@ -341,15 +414,19 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               icon: Icons.logout,
               iconColor: Colors.redAccent,
               title: "Sign Out",
-              subtitle: AuthService.currentUser?.email ?? "Google account",
+              subtitle: AuthService.isAnonymous
+                  ? "Not signed in"
+                  : (AuthService.currentUser?.email ?? "Google account"),
               onTap: () async {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     backgroundColor: context.colors.card,
                     title: const Text("Sign Out?"),
-                    content: const Text(
-                        "Your data is saved to the cloud and will be here when you sign back in."),
+                    content: Text(
+                        AuthService.isAnonymous
+                            ? "You are in local mode. Signing out will delete your local data permanently."
+                            : "Your data is saved to the cloud and will be here when you sign back in."),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),

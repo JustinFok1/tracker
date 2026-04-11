@@ -119,6 +119,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         focusedDay: _focusedDay,
         calendarFormat: CalendarFormat.month,
         availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+        rowHeight: 42.0,
         selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
         onDaySelected: (selected, focused) {
           setState(() {
