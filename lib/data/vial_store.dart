@@ -16,10 +16,13 @@ class VialStore extends ChangeNotifier {
   Future<void> init(String uid) async {
     await _sub?.cancel();
     _col = FirebaseFirestore.instance.collection('users/$uid/vials');
-    _sub = _col.snapshots().listen((snap) {
-      _vials = snap.docs.map(_fromDoc).toList();
-      notifyListeners();
-    });
+    _sub = _col.snapshots().listen(
+      (snap) {
+        _vials = snap.docs.map(_fromDoc).toList();
+        notifyListeners();
+      },
+      onError: (_) {}, // permission-denied fires on sign-out; ignore it
+    );
   }
 
   Vial _fromDoc(QueryDocumentSnapshot<Object?> doc) {

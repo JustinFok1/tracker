@@ -17,10 +17,13 @@ class ScheduleStore extends ChangeNotifier {
   Future<void> init(String uid) async {
     await _sub?.cancel();
     _col = FirebaseFirestore.instance.collection('users/$uid/schedules');
-    _sub = _col.snapshots().listen((snap) {
-      _schedules = snap.docs.map(_fromDoc).toList();
-      notifyListeners();
-    });
+    _sub = _col.snapshots().listen(
+      (snap) {
+        _schedules = snap.docs.map(_fromDoc).toList();
+        notifyListeners();
+      },
+      onError: (_) {}, // permission-denied fires on sign-out; ignore it
+    );
   }
 
   Schedule _fromDoc(QueryDocumentSnapshot<Object?> doc) {

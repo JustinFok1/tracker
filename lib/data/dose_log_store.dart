@@ -16,13 +16,16 @@ class DoseLogStore extends ChangeNotifier {
   Future<void> init(String uid) async {
     await _sub?.cancel();
     _col = FirebaseFirestore.instance.collection('users/$uid/dose_logs');
-    _sub = _col.snapshots().listen((snap) {
-      _cache.clear();
-      for (final doc in snap.docs) {
-        _cache[doc.id] = (doc.data()['taken'] as bool?) ?? false;
-      }
-      notifyListeners();
-    });
+    _sub = _col.snapshots().listen(
+      (snap) {
+        _cache.clear();
+        for (final doc in snap.docs) {
+          _cache[doc.id] = (doc.data()['taken'] as bool?) ?? false;
+        }
+        notifyListeners();
+      },
+      onError: (_) {}, // permission-denied fires on sign-out; ignore it
+    );
   }
 
   String _key(String compound, DateTime date) =>

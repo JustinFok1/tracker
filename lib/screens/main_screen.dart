@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/weight_chart.dart';
 import 'package:image_picker/image_picker.dart';
@@ -65,6 +66,18 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     }
     if (reference == latest) return null;
     return latest!.weight! - reference.weight!;
+  }
+
+  void _showSignedInPopup(BuildContext context, User? user) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (_) => _SignedInPopup(user: user),
+    );
+    // Auto-dismiss after 2.5 seconds
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (context.mounted) Navigator.of(context, rootNavigator: true).maybePop();
+    });
   }
 
   void _showLogSheet({BodyMetric? existing}) {
@@ -173,7 +186,10 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                     GestureDetector(
                       onTap: () async {
                         try {
-                          await AuthService.signInWithGoogle();
+                          final result = await AuthService.signInWithGoogle();
+                          if (result != null && mounted) {
+                            _showSignedInPopup(context, result.user);
+                          }
                         } catch (_) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -611,6 +627,151 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     );
   }
 
+}
+
+// ===== SIGNED IN POPUP =====
+class _SignedInPopup extends StatelessWidget {
+  final User? user;
+  const _SignedInPopup({this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final name = user?.displayName ?? 'Google Account';
+    final email = user?.email ?? '';
+    final photoUrl = user?.photoURL;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+        decoration: BoxDecoration(
+          color: context.colors.card,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: context.colors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 30,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Avatar with green check badge
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7B2FBE), Color(0xFFE91E8C)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: photoUrl != null
+                      ? ClipOval(
+                          child: Image.network(
+                            photoUrl,
+                            width: 72,
+                            height: 72,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => _initials(name),
+                          ),
+                        )
+                      : _initials(name),
+                ),
+                Positioned(
+                  bottom: -2,
+                  right: -2,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2ECC71),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.check, color: Colors.white, size: 14),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "Signed in!",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+            if (email.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                email,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.colors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2ECC71).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.cloud_done_rounded,
+                      color: Color(0xFF2ECC71), size: 14),
+                  const SizedBox(width: 6),
+                  Text(
+                    "Your data is now backed up",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: const Color(0xFF2ECC71).withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _initials(String name) {
+    final parts = name.trim().split(' ');
+    final initials = parts.length >= 2
+        ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
+        : name.isNotEmpty
+            ? name[0].toUpperCase()
+            : '?';
+    return Center(
+      child: Text(
+        initials,
+        style: const TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
 }
 
 // ===== LOG SHEET =====
